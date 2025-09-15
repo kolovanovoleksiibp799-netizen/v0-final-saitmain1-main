@@ -111,28 +111,6 @@ const Navbar = () => {
     },
   }
 
-  const menuItemVariants = {
-    initial: { opacity: 0, y: -10 },
-    animate: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 25,
-      },
-    },
-    hover: {
-      scale: 1.05,
-      y: -2,
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 10,
-      },
-    },
-  }
-
   const mobileMenuVariants = {
     hidden: {
       height: 0,
