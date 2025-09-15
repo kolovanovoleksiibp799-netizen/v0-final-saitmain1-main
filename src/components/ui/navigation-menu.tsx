@@ -38,9 +38,21 @@ const NavigationMenuList = React.forwardRef<
 ))
 NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName
 
-const NavigationMenuItem = cva(
-  'group relative flex items-center justify-center text-sm font-medium transition-colors hover:text-foreground focus:text-foreground disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50'
-)
+const NavigationMenuItem = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Item>
+>(({ className, ...props }, ref) => (
+  <NavigationMenuPrimitive.Item
+    ref={ref}
+    className={cn(
+      'group relative flex items-center justify-center text-sm font-medium transition-colors hover:text-foreground focus:text-foreground disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50',
+      className
+    )}
+    {...props}
+  />
+));
+NavigationMenuItem.displayName = NavigationMenuPrimitive.Item.displayName;
+
 
 const NavigationMenuTrigger = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Trigger>,
@@ -78,9 +90,23 @@ const NavigationMenuContent = React.forwardRef<
 ))
 NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName
 
-const NavigationMenuLink = cva(
-  'group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50'
-)
+const NavigationMenuLink = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Link>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Link> & {
+    className?: string;
+  }
+>(({ className, ...props }, ref) => (
+  <NavigationMenuPrimitive.Link
+    ref={ref}
+    className={cn(
+      'group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50',
+      className
+    )}
+    {...props}
+  />
+));
+NavigationMenuLink.displayName = NavigationMenuPrimitive.Link.displayName;
+
 
 const NavigationMenuViewport = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Viewport>,
