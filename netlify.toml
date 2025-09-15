@@ -1,9 +1,6 @@
 [build]
-  command = "bun run build"
+  command = "pnpm build"
   publish = "dist"
-
-# якщо будеш юзати functions, можна додати:
-# functions = "netlify/functions"
 
 [[redirects]]
   from = "/*"
