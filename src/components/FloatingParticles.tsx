@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { useBuggyEffect } from "@/contexts/BuggyEffectContext" // Import useBuggyEffect
 
 interface Particle {
   x: number
@@ -28,6 +29,7 @@ const FloatingParticles = ({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>()
   const particlesRef = useRef<Particle[]>([])
+  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -95,6 +97,12 @@ const FloatingParticles = ({
         ctx.save()
         ctx.globalAlpha = particle.opacity
 
+        // Apply buggy mode effects
+        if (isBuggyMode) {
+          ctx.filter = `hue-rotate(${Math.random() * 360}deg) saturate(200%)`;
+          ctx.globalAlpha = Math.random() * 0.5 + 0.5; // Flickering opacity
+        }
+
         // Outer glow
         ctx.shadowColor = particle.color
         ctx.shadowBlur = particle.size * 4
@@ -105,10 +113,10 @@ const FloatingParticles = ({
 
         // Inner bright core
         ctx.shadowBlur = 0
+        ctx.globalAlpha = particle.opacity * 0.8
         ctx.beginPath()
         ctx.arc(particle.x, particle.y, particle.size * 0.3, 0, Math.PI * 2)
         ctx.fillStyle = "#ffffff"
-        ctx.globalAlpha = particle.opacity * 0.8
         ctx.fill()
 
         ctx.restore()
@@ -117,7 +125,12 @@ const FloatingParticles = ({
       animationRef.current = requestAnimationFrame(animate)
     }
 
-    animate()
+    if (!isBuggyMode) {
+      animate()
+    } else {
+      cancelAnimationFrame(animationRef.current!); // Stop animation in buggy mode
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+    }
 
     return () => {
       window.removeEventListener("resize", resizeCanvas)
@@ -125,7 +138,7 @@ const FloatingParticles = ({
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [particleCount, colors])
+  }, [particleCount, colors, isBuggyMode])
 
   return (
     <canvas

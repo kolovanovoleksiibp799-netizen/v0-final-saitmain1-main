@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner'; // Corrected import to sonner
 import { useAuth } from '@/contexts/AuthContext';
+import { useBuggyEffect } from "@/contexts/BuggyEffectContext"; // Import useBuggyEffect
+import GlitchText from "./GlitchText"; // Import GlitchText
 
 interface Advertisement {
   id: string;
@@ -45,6 +47,7 @@ const EditAdModal: React.FC<EditAdModalProps> = ({ isOpen, onClose, advertisemen
     telegram_contact: '',
     price: ''
   });
+  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   const categories = {
     'automobiles': {
@@ -217,43 +220,43 @@ const EditAdModal: React.FC<EditAdModalProps> = ({ isOpen, onClose, advertisemen
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto glass-card">
+      <DialogContent className={`max-w-2xl max-h-[90vh] overflow-y-auto glass-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Редагувати оголошення</DialogTitle>
+          <DialogTitle className="text-2xl font-bold"><GlitchText intensity={isBuggyMode ? 0.9 : 0}>Редагувати оголошення</GlitchText></DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="category">Категорія *</Label>
+              <Label htmlFor="category"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Категорія *</GlitchText></Label>
               <Select
                 value={formData.category}
                 onValueChange={(value) => setFormData({ ...formData, category: value, subcategory: '' })}
               >
-                <SelectTrigger className="rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background">
-                  <SelectValue placeholder="Оберіть категорію" />
+                <SelectTrigger className={`rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background ${isBuggyMode ? 'animate-button-flicker' : ''}`}>
+                  <SelectValue placeholder={<GlitchText intensity={isBuggyMode ? 0.6 : 0}>Оберіть категорію</GlitchText>} />
                 </SelectTrigger>
                 <SelectContent className="rounded-2xl shadow-soft">
                   {Object.entries(categories).map(([key, cat]) => (
-                    <SelectItem key={key} value={key}>{cat.name}</SelectItem>
+                    <SelectItem key={key} value={key}><GlitchText intensity={isBuggyMode ? 0.5 : 0}>{cat.name}</GlitchText></SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="subcategory">Підкатегорія *</Label>
+              <Label htmlFor="subcategory"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Підкатегорія *</GlitchText></Label>
               <Select
                 value={formData.subcategory}
                 onValueChange={(value) => setFormData({ ...formData, subcategory: value })}
                 disabled={!formData.category}
               >
-                <SelectTrigger className="rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background">
-                  <SelectValue placeholder="Оберіть підкатегорію" />
+                <SelectTrigger className={`rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background ${isBuggyMode ? 'animate-button-flicker' : ''}`}>
+                  <SelectValue placeholder={<GlitchText intensity={isBuggyMode ? 0.6 : 0}>Оберіть підкатегорію</GlitchText>} />
                 </SelectTrigger>
                 <SelectContent className="rounded-2xl shadow-soft">
                   {formData.category && categories[formData.category as keyof typeof categories]?.subcategories.map((sub) => (
-                    <SelectItem key={sub.value} value={sub.value}>{sub.name}</SelectItem>
+                    <SelectItem key={sub.value} value={sub.value}><GlitchText intensity={isBuggyMode ? 0.5 : 0}>{sub.name}</GlitchText></SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -261,31 +264,31 @@ const EditAdModal: React.FC<EditAdModalProps> = ({ isOpen, onClose, advertisemen
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="title">Назва оголошення *</Label>
+            <Label htmlFor="title"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Назва оголошення *</GlitchText></Label>
             <Input
               id="title"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+              className={`rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
               placeholder="Введіть назву оголошення"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Опис оголошення *</Label>
+            <Label htmlFor="description"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Опис оголошення *</GlitchText></Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="rounded-2xl min-h-32 focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+              className={`rounded-2xl min-h-32 focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
               placeholder="Детальний опис вашого оголошення"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="price">Ціна (грн)</Label>
+            <Label htmlFor="price"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Ціна (грн)</GlitchText></Label>
             <Input
               id="price"
               type="number"
@@ -293,44 +296,44 @@ const EditAdModal: React.FC<EditAdModalProps> = ({ isOpen, onClose, advertisemen
               min="0"
               value={formData.price}
               onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-              className="rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+              className={`rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
               placeholder="Вкажіть ціну (необов'язково)"
             />
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="discord">Discord контакт</Label>
+              <Label htmlFor="discord"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Discord контакт</GlitchText></Label>
               <Input
                 id="discord"
                 value={formData.discord_contact}
                 onChange={(e) => setFormData({ ...formData, discord_contact: e.target.value })}
-                className="rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+                className={`rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
                 placeholder="username#1234"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="telegram">Telegram контакт</Label>
+              <Label htmlFor="telegram"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Telegram контакт</GlitchText></Label>
               <Input
                 id="telegram"
                 value={formData.telegram_contact}
                 onChange={(e) => setFormData({ ...formData, telegram_contact: e.target.value })}
-                className="rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+                className={`rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
                 placeholder="@username"
               />
             </div>
           </div>
 
           <div className="space-y-4">
-            <Label>Зображення (до 10 штук)</Label>
+            <Label><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Зображення (до 10 штук)</GlitchText></Label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {images.map((image, index) => (
                 <div key={index} className="relative group">
                   <img
                     src={image}
                     alt={`Зображення ${index + 1}`}
-                    className="w-full h-24 object-cover rounded-xl border"
+                    className={`w-full h-24 object-cover rounded-xl border ${isBuggyMode ? 'animate-image-distort' : ''}`}
                     onError={(e) => {
                       e.currentTarget.src = 'https://via.placeholder.com/150x100?text=Помилка';
                     }}
@@ -339,7 +342,7 @@ const EditAdModal: React.FC<EditAdModalProps> = ({ isOpen, onClose, advertisemen
                     type="button"
                     variant="destructive"
                     size="icon"
-                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110 glow-on-hover"
+                    className={`absolute -top-2 -right-2 w-6 h-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110 glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}
                     onClick={() => handleImageRemove(index)}
                   >
                     <X className="w-3 h-3" />
@@ -349,8 +352,8 @@ const EditAdModal: React.FC<EditAdModalProps> = ({ isOpen, onClose, advertisemen
               
               {uploadingImages.map((_, index) => (
                 <div key={`uploading-${index}`} className="relative">
-                  <div className="w-full h-24 bg-muted rounded-xl border animate-pulse flex items-center justify-center">
-                    <Upload className="w-6 h-6 text-muted-foreground animate-spin" />
+                  <div className={`w-full h-24 bg-muted rounded-xl border animate-pulse flex items-center justify-center ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
+                    <Upload className={`w-6 h-6 text-muted-foreground animate-spin ${isBuggyMode ? 'animate-spin-slow' : ''}`} />
                   </div>
                 </div>
               ))}
@@ -370,20 +373,20 @@ const EditAdModal: React.FC<EditAdModalProps> = ({ isOpen, onClose, advertisemen
                         }
                       }}
                     />
-                    <div className="h-24 rounded-xl border-dashed border-2 border-border hover:border-accent flex flex-col items-center justify-center hover:scale-105 transition-transform bg-background hover:bg-muted glow-on-hover">
-                      <Upload className="w-5 h-5 mb-1 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Завантажити</span>
+                    <div className={`h-24 rounded-xl border-dashed border-2 border-border hover:border-accent flex flex-col items-center justify-center hover:scale-105 transition-transform bg-background hover:bg-muted glow-on-hover ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
+                      <Upload className={`w-5 h-5 mb-1 text-muted-foreground ${isBuggyMode ? 'animate-spin-reverse' : ''}`} />
+                      <span className="text-xs text-muted-foreground"><GlitchText intensity={isBuggyMode ? 0.5 : 0}>Завантажити</GlitchText></span>
                     </div>
                   </label>
                   
                   <Button
                     type="button"
                     variant="outline"
-                    className="h-24 rounded-xl border-dashed hover:scale-105 transition-transform flex flex-col glow-on-hover"
+                    className={`h-24 rounded-xl border-dashed hover:scale-105 transition-transform flex flex-col glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}
                     onClick={handleImageAdd}
                   >
                     <Plus className="w-5 h-5 mb-1" />
-                    <span className="text-xs">URL</span>
+                    <span className="text-xs"><GlitchText intensity={isBuggyMode ? 0.5 : 0}>URL</GlitchText></span>
                   </Button>
                 </>
               )}
@@ -391,15 +394,15 @@ const EditAdModal: React.FC<EditAdModalProps> = ({ isOpen, onClose, advertisemen
           </div>
 
           <div className="flex justify-end gap-4">
-            <Button type="button" variant="outline" onClick={onClose} className="rounded-2xl hover:scale-105 transition-transform glow-on-hover">
-              Скасувати
+            <Button type="button" variant="outline" onClick={onClose} className={`rounded-2xl hover:scale-105 transition-transform glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}>
+              <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Скасувати</GlitchText>
             </Button>
             <Button
               type="submit"
-              className="btn-accent rounded-2xl hover:shadow-glow glow-on-hover"
+              className={`btn-accent rounded-2xl hover:shadow-glow glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}
               disabled={loading}
             >
-              {loading ? 'Збереження...' : 'Зберегти зміни'}
+              {loading ? <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Збереження...</GlitchText> : <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Зберегти зміни</GlitchText>}
             </Button>
           </div>
         </form>

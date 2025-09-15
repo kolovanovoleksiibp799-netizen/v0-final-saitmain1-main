@@ -3,6 +3,8 @@
 import { Crown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
+import { useBuggyEffect } from "@/contexts/BuggyEffectContext" // Import useBuggyEffect
+import GlitchText from "./GlitchText" // Import GlitchText
 
 interface VipBadgeProps {
   className?: string
@@ -11,6 +13,8 @@ interface VipBadgeProps {
 }
 
 export default function VipBadge({ className = "", size = "md", animated = true }: VipBadgeProps) {
+  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
+
   const sizeClasses = {
     sm: "text-xs px-2 py-1",
     md: "text-sm px-3 py-1",
@@ -25,10 +29,10 @@ export default function VipBadge({ className = "", size = "md", animated = true 
 
   const BadgeComponent = (
     <Badge
-      className={`bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-semibold border-0 ${sizeClasses[size]} ${className}`}
+      className={`bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-semibold border-0 ${sizeClasses[size]} ${className} ${isBuggyMode ? 'animate-flicker' : ''}`}
     >
       <Crown className={`${iconSizes[size]} mr-1`} />
-      VIP
+      <GlitchText intensity={isBuggyMode ? 0.7 : 0}>VIP</GlitchText>
     </Badge>
   )
 

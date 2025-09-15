@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { useBuggyEffect } from "@/contexts/BuggyEffectContext" // Import useBuggyEffect
 
 interface LiquidGrassBackgroundProps {
   className?: string
@@ -9,6 +10,7 @@ interface LiquidGrassBackgroundProps {
 const LiquidGrassBackground = ({ className = "" }: LiquidGrassBackgroundProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>()
+  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -137,7 +139,12 @@ const LiquidGrassBackground = ({ className = "" }: LiquidGrassBackgroundProps) =
       animationRef.current = requestAnimationFrame(animate)
     }
 
-    animate()
+    if (!isBuggyMode) {
+      animate()
+    } else {
+      cancelAnimationFrame(animationRef.current!); // Stop animation in buggy mode
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+    }
 
     return () => {
       window.removeEventListener("resize", resizeCanvas)
@@ -145,7 +152,7 @@ const LiquidGrassBackground = ({ className = "" }: LiquidGrassBackgroundProps) =
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [])
+  }, [isBuggyMode])
 
   return (
     <canvas

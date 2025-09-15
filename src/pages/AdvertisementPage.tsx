@@ -14,6 +14,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { hasPermission, initializeUserContext } from '@/lib/auth';
 import EditAdModal from '@/components/EditAdModal';
 import ContactButton from '@/components/ContactButton';
+import { useBuggyEffect } from "@/contexts/BuggyEffectContext"; // Import useBuggyEffect
+import GlitchText from "@/components/GlitchText"; // Import GlitchText
 
 interface Advertisement {
   id: string;
@@ -41,6 +43,7 @@ const AdvertisementPage = () => {
   const [advertisement, setAdvertisement] = useState<Advertisement | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   useEffect(() => {
     const initAndFetch = async () => {
@@ -120,9 +123,11 @@ const AdvertisementPage = () => {
         <Navbar />
         <section className="pt-24 pb-16">
           <div className="container mx-auto px-6 text-center">
-            <h1 className="text-2xl font-bold mb-4">Оголошення не знайдено</h1>
+            <h1 className="text-2xl font-bold mb-4"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Оголошення не знайдено</GlitchText></h1>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
-              <Button className="btn-accent glow-on-hover">Повернутися до категорій</Button>
+              <Button className={`btn-accent glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}>
+                <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Повернутися до категорій</GlitchText>
+              </Button>
             </motion.div>
           </div>
         </section>
@@ -135,7 +140,7 @@ const AdvertisementPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <section className="pt-24 pb-16">
+      <section className={`pt-24 pb-16 ${isBuggyMode ? 'animate-global-glitch' : ''}`}>
         <div className="container mx-auto px-6 max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -146,14 +151,14 @@ const AdvertisementPage = () => {
               <Button
                 variant="ghost"
                 onClick={() => window.history.back()}
-                className="mb-6 glow-on-hover"
+                className={`mb-6 glow-on-hover ${isBuggyMode ? 'animate-card-wobble' : ''}`}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Назад
+                <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Назад</GlitchText>
               </Button>
             </motion.div>
 
-            <Card className={`glass-card ${advertisement.is_vip ? 'border-accent shadow-accent/20' : ''}`}>
+            <Card className={`glass-card ${advertisement.is_vip ? 'border-accent shadow-accent/20' : ''} ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
               <CardContent className="p-0">
                 {/* Image Gallery */}
                 {advertisement.images && advertisement.images.length > 0 && (
@@ -166,7 +171,7 @@ const AdvertisementPage = () => {
                               <img
                                 src={image}
                                 alt={`${advertisement.title} - зображення ${index + 1}`}
-                                className="w-full h-full object-cover rounded-t-3xl"
+                                className={`w-full h-full object-cover rounded-t-3xl ${isBuggyMode ? 'animate-image-distort' : ''}`}
                                 onError={(e) => {
                                   e.currentTarget.src = 'https://via.placeholder.com/800x600?text=Помилка+завантаження';
                                 }}
@@ -177,8 +182,8 @@ const AdvertisementPage = () => {
                       </CarouselContent>
                       {advertisement.images.length > 1 && (
                         <>
-                          <CarouselPrevious className="left-4 glow-on-hover" />
-                          <CarouselNext className="right-4 glow-on-hover" />
+                          <CarouselPrevious className={`left-4 glow-on-hover ${isBuggyMode ? 'animate-spin-slow' : ''}`} />
+                          <CarouselNext className={`right-4 glow-on-hover ${isBuggyMode ? 'animate-spin-reverse' : ''}`} />
                         </>
                       )}
                     </Carousel>
@@ -186,15 +191,15 @@ const AdvertisementPage = () => {
                     {/* Badges */}
                     <div className="absolute top-4 right-4 flex gap-2">
                       {advertisement.is_vip && (
-                        <Badge variant="vip" className="shadow-lg">
+                        <Badge variant="vip" className={`shadow-lg ${isBuggyMode ? 'animate-flicker' : ''}`}>
                           <Crown className="w-3 h-3 mr-1" />
-                          VIP
+                          <GlitchText intensity={isBuggyMode ? 0.7 : 0}>VIP</GlitchText>
                         </Badge>
                       )}
                       {advertisement.users?.role === 'admin' && (
-                        <Badge variant="admin" className="shadow-lg">
+                        <Badge variant="admin" className={`shadow-lg ${isBuggyMode ? 'animate-flicker' : ''}`}>
                           <Shield className="w-3 h-3 mr-1" />
-                          АДМІН
+                          <GlitchText intensity={isBuggyMode ? 0.7 : 0}>АДМІН</GlitchText>
                         </Badge>
                       )}
                     </div>
@@ -205,14 +210,14 @@ const AdvertisementPage = () => {
                   {/* Header */}
                   <div className="mb-6">
                     <h1 className="text-3xl md:text-4xl font-bold mb-4">
-                      {advertisement.title}
+                      <GlitchText intensity={isBuggyMode ? 0.9 : 0}>{advertisement.title}</GlitchText>
                     </h1>
                     
                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
                         <div className="flex items-center gap-2">
-                          <Link to={`/profile/${advertisement.user_id}`} className="font-medium text-foreground hover:text-accent transition-colors">
-                            {advertisement.users?.nickname}
+                          <Link to={`/profile/${advertisement.user_id}`} className={`font-medium text-foreground hover:text-accent transition-colors ${isBuggyMode ? 'text-red-500 hover:text-green-500' : ''}`}>
+                            <GlitchText intensity={isBuggyMode ? 0.7 : 0}>{advertisement.users?.nickname}</GlitchText>
                           </Link>
                           {advertisement.users?.role !== 'user' && (
                             <Badge 
@@ -220,23 +225,28 @@ const AdvertisementPage = () => {
                                 advertisement.users?.role === 'admin' ? 'admin' :
                                 advertisement.users?.role === 'vip' ? 'vip' : 'outline'
                               }
+                              className={`${isBuggyMode ? 'animate-flicker' : ''}`}
                             >
-                              {advertisement.users?.role === 'vip' ? 'VIP' : 
-                               advertisement.users?.role === 'moderator' ? 'Модератор' : 
-                               advertisement.users?.role === 'admin' ? 'Адмін' : ''}
+                              <GlitchText intensity={isBuggyMode ? 0.7 : 0}>
+                                {advertisement.users?.role === 'vip' ? 'VIP' : 
+                                 advertisement.users?.role === 'moderator' ? 'Модератор' : 
+                                 advertisement.users?.role === 'admin' ? 'Адмін' : ''}
+                              </GlitchText>
                             </Badge>
                           )}
                         </div>
                         
                         <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4" />
-                          {new Date(advertisement.created_at).toLocaleDateString('uk-UA', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
+                          <Calendar className={`w-4 h-4 ${isBuggyMode ? 'animate-spin-slow' : ''}`} />
+                          <GlitchText intensity={isBuggyMode ? 0.5 : 0}>
+                            {new Date(advertisement.created_at).toLocaleDateString('uk-UA', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </GlitchText>
                         </div>
                       </div>
 
@@ -248,10 +258,10 @@ const AdvertisementPage = () => {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setIsEditModalOpen(true)}
-                                className="rounded-2xl glow-on-hover"
+                                className={`rounded-2xl glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}
                               >
                                 <Edit className="w-4 h-4 mr-2" />
-                                Редагувати
+                                <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Редагувати</GlitchText>
                               </Button>
                             </motion.div>
                             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
@@ -259,10 +269,10 @@ const AdvertisementPage = () => {
                                 variant="destructive"
                                 size="sm"
                                 onClick={handleDelete}
-                                className="rounded-2xl glow-on-hover"
+                                className={`rounded-2xl glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}
                               >
                                 <Trash2 className="w-4 h-4 mr-2" />
-                                Видалити
+                                <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Видалити</GlitchText>
                               </Button>
                             </motion.div>
                           </>
@@ -283,23 +293,23 @@ const AdvertisementPage = () => {
                   {/* Price */}
                   {advertisement.price && (
                     <div className="mb-6">
-                      <div className="text-3xl font-bold text-accent">
-                        {advertisement.price.toLocaleString('uk-UA')} грн
+                      <div className={`text-3xl font-bold text-accent ${isBuggyMode ? 'animate-flicker' : ''}`}>
+                        <GlitchText intensity={isBuggyMode ? 0.9 : 0}>{advertisement.price.toLocaleString('uk-UA')} грн</GlitchText>
                       </div>
                     </div>
                   )}
 
                   {/* Description */}
                   <div className="mb-8">
-                    <h2 className="text-xl font-semibold mb-4">Опис</h2>
+                    <h2 className="text-xl font-semibold mb-4"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Опис</GlitchText></h2>
                     <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                      {advertisement.description}
+                      <GlitchText intensity={isBuggyMode ? 0.6 : 0}>{advertisement.description}</GlitchText>
                     </p>
                   </div>
                   
                   {/* Contact */}
                   <div className="border-t pt-6">
-                    <h2 className="text-xl font-semibold mb-4">Контакти</h2>
+                    <h2 className="text-xl font-semibold mb-4"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Контакти</GlitchText></h2>
                     <div className="flex flex-wrap gap-4">
                       {advertisement.discord_contact && (
                         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
@@ -310,10 +320,10 @@ const AdvertisementPage = () => {
                               navigator.clipboard.writeText(advertisement.discord_contact!);
                               toast.success('Discord скопійовано в буфер обміну');
                             }}
-                            className="rounded-2xl glow-on-hover"
+                            className={`rounded-2xl glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}
                           >
                             <MessageCircle className="w-5 h-5 mr-2" />
-                            Discord: {advertisement.discord_contact}
+                            <GlitchText intensity={isBuggyMode ? 0.7 : 0}>Discord: {advertisement.discord_contact}</GlitchText>
                           </Button>
                         </motion.div>
                       )}
@@ -321,11 +331,11 @@ const AdvertisementPage = () => {
                         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
                           <Button 
                             size="lg" 
-                            className="btn-accent rounded-2xl glow-on-hover"
+                            className={`btn-accent rounded-2xl glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}
                             onClick={() => window.open(`https://t.me/${advertisement.telegram_contact?.replace('@', '')}`, '_blank')}
                           >
                             <MessageCircle className="w-5 h-5 mr-2" />
-                            Telegram: {advertisement.telegram_contact}
+                            <GlitchText intensity={isBuggyMode ? 0.7 : 0}>Telegram: {advertisement.telegram_contact}</GlitchText>
                           </Button>
                         </motion.div>
                       )}

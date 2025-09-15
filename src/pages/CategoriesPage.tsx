@@ -2,8 +2,12 @@ import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
+import { useBuggyEffect } from "@/contexts/BuggyEffectContext"; // Import useBuggyEffect
+import GlitchText from "@/components/GlitchText"; // Import GlitchText
 
 const CategoriesPage = () => {
+  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
+
   const groups = [
     {
       title: 'Автомобілі',
@@ -46,7 +50,7 @@ const CategoriesPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <section className="pt-24 pb-16">
+      <section className={`pt-24 pb-16 ${isBuggyMode ? 'animate-global-glitch' : ''}`}>
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -55,10 +59,12 @@ const CategoriesPage = () => {
             className="text-center mb-12"
           >
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="bg-gradient-primary bg-clip-text text-transparent">Категорії</span>
+              <span className="bg-gradient-primary bg-clip-text text-transparent">
+                <GlitchText intensity={isBuggyMode ? 0.9 : 0}>Категорії</GlitchText>
+              </span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Оберіть категорію, щоб переглянути доступні підрозділи
+              <GlitchText intensity={isBuggyMode ? 0.7 : 0}>Оберіть категорію, щоб переглянути доступні підрозділи</GlitchText>
             </p>
           </motion.div>
 
@@ -74,17 +80,17 @@ const CategoriesPage = () => {
                   boxShadow: "0 20px 60px -15px hsl(var(--shadow-soft) / 0.4)"
                 }}
                 transition={{ duration: 0.4, delay: gi * 0.05 }}
-                className="glass-card p-6"
+                className={`glass-card p-6 ${isBuggyMode ? 'animate-card-wobble' : ''}`}
               >
-                <h2 className="text-xl font-semibold mb-4 text-foreground group-hover:text-accent transition-colors duration-300">{group.title}</h2>
+                <h2 className="text-xl font-semibold mb-4 text-foreground group-hover:text-accent transition-colors duration-300"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>{group.title}</GlitchText></h2>
                 <ul className="space-y-2">
                   {group.items.map((item) => (
                     <motion.li key={item.href} whileHover={{ x: 5 }}>
                       <Link
                         to={item.href}
-                        className="block rounded-xl px-4 py-3 text-sm text-muted-foreground hover:text-accent hover:bg-accent/10 transition-all duration-300 hover:shadow-sm transform-gpu glow-on-hover"
+                        className={`block rounded-xl px-4 py-3 text-sm text-muted-foreground hover:text-accent hover:bg-accent/10 transition-all duration-300 hover:shadow-sm transform-gpu glow-on-hover ${isBuggyMode ? 'text-red-500 hover:text-green-500' : ''}`}
                       >
-                        {item.title}
+                        <GlitchText intensity={isBuggyMode ? 0.6 : 0}>{item.title}</GlitchText>
                       </Link>
                     </motion.li>
                   ))}

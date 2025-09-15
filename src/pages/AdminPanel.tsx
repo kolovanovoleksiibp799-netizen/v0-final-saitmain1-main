@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Search, Ban, Shield, Crown, Trash2, Eye, Users, FileText, BarChart3, Download, ExternalLink, UserCheck, UserX } from 'lucide-react';
+import { ArrowLeft, Search, Ban, Shield, Crown, Trash2, Eye, Users, FileText, BarChart3, Download, ExternalLink, UserCheck, UserX, MessageSquare } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { hasPermission, updateUserRole, banUser, giveVipStatus } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { usePagination } from '@/hooks/use-pagination'; // Assuming this hook is correct and available
+import { useBuggyEffect } from "@/contexts/BuggyEffectContext"; // Import useBuggyEffect
+import GlitchText from "@/components/GlitchText"; // Import GlitchText
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'; // Import Table components
 
 interface UserProfile {
   id: string;
@@ -76,6 +79,7 @@ interface AdminStats {
 const AdminPanel = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   // State management
   const [stats, setStats] = useState<AdminStats>({
@@ -422,8 +426,8 @@ const AdminPanel = () => {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="pt-24 pb-16 text-center">
-          <h1 className="text-2xl font-bold mb-4">Доступ заборонено</h1>
-          <p className="text-muted-foreground">У вас немає прав для доступу до адмін панелі</p>
+          <h1 className="text-2xl font-bold mb-4"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Доступ заборонено</GlitchText></h1>
+          <p className="text-muted-foreground"><GlitchText intensity={isBuggyMode ? 0.6 : 0}>У вас немає прав для доступу до адмін панелі</GlitchText></p>
         </div>
         <Footer />
       </div>
@@ -431,7 +435,7 @@ const AdminPanel = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background p-6">
+    <div className={`min-h-screen bg-gradient-to-br from-background via-background-secondary to-background p-6 ${isBuggyMode ? 'animate-global-glitch' : ''}`}>
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -440,9 +444,9 @@ const AdminPanel = () => {
           className="mb-8"
         >
           <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-            Адміністративна панель
+            <GlitchText intensity={isBuggyMode ? 0.9 : 0}>Адміністративна панель</GlitchText>
           </h1>
-          <p className="text-muted-foreground">Управління користувачами та оголошеннями Skoropad</p>
+          <p className="text-muted-foreground"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Управління користувачами та оголошеннями Skoropad</GlitchText></p>
         </motion.div>
 
         {/* Stats Cards */}
@@ -452,47 +456,47 @@ const AdminPanel = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
         >
-          <Card className="glass-card">
+          <Card className={`glass-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Всього користувачів</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Всього користувачів</GlitchText></CardTitle>
+              <Users className={`h-4 w-4 text-muted-foreground ${isBuggyMode ? 'animate-spin-slow' : ''}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalUsers}</div>
-              <p className="text-xs text-muted-foreground">+{stats.todayRegistrations} сьогодні</p>
+              <div className="text-2xl font-bold"><GlitchText intensity={isBuggyMode ? 0.9 : 0}>{stats.totalUsers}</GlitchText></div>
+              <p className="text-xs text-muted-foreground"><GlitchText intensity={isBuggyMode ? 0.5 : 0}>+{stats.todayRegistrations} сьогодні</GlitchText></p>
             </CardContent>
           </Card>
 
-          <Card className="glass-card">
+          <Card className={`glass-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Всього оголошень</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Всього оголошень</GlitchText></CardTitle>
+              <FileText className={`h-4 w-4 text-muted-foreground ${isBuggyMode ? 'animate-spin-reverse' : ''}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalAds}</div>
-              <p className="text-xs text-muted-foreground">+{stats.todayAds} сьогодні</p>
+              <div className="text-2xl font-bold"><GlitchText intensity={isBuggyMode ? 0.9 : 0}>{stats.totalAds}</GlitchText></div>
+              <p className="text-xs text-muted-foreground"><GlitchText intensity={isBuggyMode ? 0.5 : 0}>+{stats.todayAds} сьогодні</GlitchText></p>
             </CardContent>
           </Card>
 
-          <Card className="glass-card">
+          <Card className={`glass-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">VIP користувачі</CardTitle>
-              <Crown className="h-4 w-4 text-yellow-500" />
+              <CardTitle className="text-sm font-medium"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>VIP користувачі</GlitchText></CardTitle>
+              <Crown className={`h-4 w-4 text-yellow-500 ${isBuggyMode ? 'animate-flicker' : ''}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.vipUsers}</div>
-              <p className="text-xs text-muted-foreground">Активні VIP</p>
+              <div className="text-2xl font-bold"><GlitchText intensity={isBuggyMode ? 0.9 : 0}>{stats.vipUsers}</GlitchText></div>
+              <p className="text-xs text-muted-foreground"><GlitchText intensity={isBuggyMode ? 0.5 : 0}>Активні VIP</GlitchText></p>
             </CardContent>
           </Card>
 
-          <Card className="glass-card">
+          <Card className={`glass-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Повідомлення</CardTitle>
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Повідомлення</GlitchText></CardTitle>
+              <MessageSquare className={`h-4 w-4 text-muted-foreground ${isBuggyMode ? 'animate-spin-fast' : ''}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalMessages}</div>
-              <p className="text-xs text-muted-foreground">Всього повідомлень</p>
+              <div className="text-2xl font-bold"><GlitchText intensity={isBuggyMode ? 0.9 : 0}>{stats.totalMessages}</GlitchText></div>
+              <p className="text-xs text-muted-foreground"><GlitchText intensity={isBuggyMode ? 0.5 : 0}>Всього повідомлень</GlitchText></p>
             </CardContent>
           </Card>
         </motion.div>
@@ -504,41 +508,41 @@ const AdminPanel = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <Tabs defaultValue="users" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-              <TabsTrigger value="users">Користувачі</TabsTrigger>
-              <TabsTrigger value="ads">Оголошення</TabsTrigger>
+            <TabsList className={`grid w-full grid-cols-2 lg:w-[400px] ${isBuggyMode ? 'animate-button-flicker' : ''}`}>
+              <TabsTrigger value="users"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Користувачі</GlitchText></TabsTrigger>
+              <TabsTrigger value="ads"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Оголошення</GlitchText></TabsTrigger>
               {user?.role === 'admin' && (
-                <TabsTrigger value="logs">Логи</TabsTrigger>
+                <TabsTrigger value="logs"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Логи</GlitchText></TabsTrigger>
               )}
             </TabsList>
 
             <TabsContent value="users" className="space-y-6">
-              <Card className="glass-card">
+              <Card className={`glass-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
                 <CardHeader>
-                  <CardTitle>Управління користувачами</CardTitle>
-                  <CardDescription>Перегляд та управління користувачами платформи</CardDescription>
+                  <CardTitle><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Управління користувачами</GlitchText></CardTitle>
+                  <CardDescription><GlitchText intensity={isBuggyMode ? 0.6 : 0}>Перегляд та управління користувачами платформи</GlitchText></CardDescription>
 
                   {/* Search and Filter Controls */}
                   <div className="flex flex-col sm:flex-row gap-4 pt-4">
                     <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 ${isBuggyMode ? 'animate-flicker' : ''}`} />
                       <Input
                         placeholder="Пошук користувачів..."
                         value={userSearch}
                         onChange={(e) => setUserSearch(e.target.value)}
-                        className="pl-10"
+                        className={`pl-10 ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
                       />
                     </div>
                     <Select value={userRoleFilter} onValueChange={setUserRoleFilter}>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Фільтр за роллю" />
+                      <SelectTrigger className={`w-[180px] ${isBuggyMode ? 'animate-button-flicker' : ''}`}>
+                        <SelectValue placeholder={<GlitchText intensity={isBuggyMode ? 0.7 : 0}>Фільтр за роллю</GlitchText>} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Всі ролі</SelectItem>
-                        <SelectItem value="user">Користувач</SelectItem>
-                        <SelectItem value="vip">VIP</SelectItem>
-                        <SelectItem value="moderator">Модератор</SelectItem>
-                        <SelectItem value="admin">Адміністратор</SelectItem>
+                        <SelectItem value="all"><GlitchText intensity={isBuggyMode ? 0.6 : 0}>Всі ролі</GlitchText></SelectItem>
+                        <SelectItem value="user"><GlitchText intensity={isBuggyMode ? 0.6 : 0}>Користувач</GlitchText></SelectItem>
+                        <SelectItem value="vip"><GlitchText intensity={isBuggyMode ? 0.6 : 0}>VIP</GlitchText></SelectItem>
+                        <SelectItem value="moderator"><GlitchText intensity={isBuggyMode ? 0.6 : 0}>Модератор</GlitchText></SelectItem>
+                        <SelectItem value="admin"><GlitchText intensity={isBuggyMode ? 0.6 : 0}>Адміністратор</GlitchText></SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -553,19 +557,19 @@ const AdminPanel = () => {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Нікнейм</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Роль</TableHead>
-                            <TableHead>Статус</TableHead>
-                            <TableHead>Дата реєстрації</TableHead>
-                            <TableHead>Дії</TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Нікнейм</GlitchText></TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Email</GlitchText></TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Роль</GlitchText></TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Статус</GlitchText></TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Дата реєстрації</GlitchText></TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Дії</GlitchText></TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {users.map((targetUser) => (
-                            <TableRow key={targetUser.id}>
-                              <TableCell className="font-medium">{targetUser.nickname}</TableCell>
-                              <TableCell>{targetUser.email || "Не вказано"}</TableCell>
+                            <TableRow key={targetUser.id} className={`${isBuggyMode ? 'animate-global-glitch' : ''}`}>
+                              <TableCell className="font-medium"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>{targetUser.nickname}</GlitchText></TableCell>
+                              <TableCell><GlitchText intensity={isBuggyMode ? 0.6 : 0}>{targetUser.email || "Не вказано"}</GlitchText></TableCell>
                               <TableCell>
                                 <Badge
                                   variant={
@@ -577,22 +581,24 @@ const AdminPanel = () => {
                                           ? "secondary"
                                           : "outline"
                                   }
+                                  className={`${isBuggyMode ? 'animate-flicker' : ''}`}
                                 >
-                                  {targetUser.role.toUpperCase()}
+                                  <GlitchText intensity={isBuggyMode ? 0.7 : 0}>{targetUser.role.toUpperCase()}</GlitchText>
                                 </Badge>
                               </TableCell>
                               <TableCell>
-                                <Badge variant={targetUser.is_banned ? "destructive" : "default"}>
-                                  {targetUser.is_banned ? "Заблокований" : "Активний"}
+                                <Badge variant={targetUser.is_banned ? "destructive" : "default"} className={`${isBuggyMode ? 'animate-flicker' : ''}`}>
+                                  <GlitchText intensity={isBuggyMode ? 0.7 : 0}>{targetUser.is_banned ? "Заблокований" : "Активний"}</GlitchText>
                                 </Badge>
                               </TableCell>
-                              <TableCell>{new Date(targetUser.created_at).toLocaleDateString("uk-UA")}</TableCell>
+                              <TableCell><GlitchText intensity={isBuggyMode ? 0.6 : 0}>{new Date(targetUser.created_at).toLocaleDateString("uk-UA")}</GlitchText></TableCell>
                               <TableCell>
                                 <div className="flex space-x-2">
                                   <Button
                                     variant={targetUser.is_banned ? "default" : "destructive"}
                                     size="sm"
                                     onClick={() => handleUserAction(targetUser.id, "ban", !targetUser.is_banned)}
+                                    className={`${isBuggyMode ? 'animate-button-flicker' : ''}`}
                                   >
                                     {targetUser.is_banned ? <UserCheck className="w-4 h-4" /> : <UserX className="w-4 h-4" />}
                                   </Button>
@@ -600,6 +606,7 @@ const AdminPanel = () => {
                                     variant="outline"
                                     size="sm"
                                     onClick={() => handleUserAction(targetUser.id, "vip", 30)}
+                                    className={`${isBuggyMode ? 'animate-button-flicker' : ''}`}
                                   >
                                     <Crown className="w-4 h-4" />
                                   </Button>
@@ -618,7 +625,7 @@ const AdminPanel = () => {
                               <PaginationPrevious
                                 onClick={() => userPagination.goToPreviousPage()}
                                 className={
-                                  !userPagination.hasPreviousPage ? "pointer-events-none opacity-50" : "cursor-pointer"
+                                  !userPagination.hasPreviousPage ? "pointer-events-none opacity-50" : `cursor-pointer ${isBuggyMode ? 'animate-spin-slow' : ''}`
                                 }
                               />
                             </PaginationItem>
@@ -628,9 +635,9 @@ const AdminPanel = () => {
                                 <PaginationLink
                                   onClick={() => userPagination.goToPage(pageNumber)}
                                   isActive={pageNumber === userPagination.currentPage}
-                                  className="cursor-pointer"
+                                  className={`cursor-pointer ${isBuggyMode ? 'animate-flicker' : ''}`}
                                 >
-                                  {pageNumber}
+                                  <GlitchText intensity={isBuggyMode ? 0.5 : 0}>{pageNumber}</GlitchText>
                                 </PaginationLink>
                               </PaginationItem>
                             ))}
@@ -639,7 +646,7 @@ const AdminPanel = () => {
                               <PaginationNext
                                 onClick={() => userPagination.goToNextPage()}
                                 className={
-                                  !userPagination.hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"
+                                  !userPagination.hasNextPage ? "pointer-events-none opacity-50" : `cursor-pointer ${isBuggyMode ? 'animate-spin-reverse' : ''}`
                                 }
                               />
                             </PaginationItem>
@@ -653,32 +660,32 @@ const AdminPanel = () => {
             </TabsContent>
 
             <TabsContent value="ads" className="space-y-6">
-              <Card className="glass-card">
+              <Card className={`glass-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
                 <CardHeader>
-                  <CardTitle>Управління оголошеннями</CardTitle>
-                  <CardDescription>Перегляд та модерація оголошень</CardDescription>
+                  <CardTitle><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Управління оголошеннями</GlitchText></CardTitle>
+                  <CardDescription><GlitchText intensity={isBuggyMode ? 0.6 : 0}>Перегляд та модерація оголошень</GlitchText></CardDescription>
 
                   {/* Search and Filter Controls */}
                   <div className="flex flex-col sm:flex-row gap-4 pt-4">
                     <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 ${isBuggyMode ? 'animate-flicker' : ''}`} />
                       <Input
                         placeholder="Пошук оголошень..."
                         value={adSearch}
                         onChange={(e) => setAdSearch(e.target.value)}
-                        className="pl-10"
+                        className={`pl-10 ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
                       />
                     </div>
                     <Select value={adStatusFilter} onValueChange={setAdStatusFilter}>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Фільтр за статусом" />
+                      <SelectTrigger className={`w-[180px] ${isBuggyMode ? 'animate-button-flicker' : ''}`}>
+                        <SelectValue placeholder={<GlitchText intensity={isBuggyMode ? 0.7 : 0}>Фільтр за статусом</GlitchText>} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Всі статуси</SelectItem>
-                        <SelectItem value="active">Активне</SelectItem>
-                        <SelectItem value="pending">На розгляді</SelectItem>
-                        <SelectItem value="rejected">Відхилено</SelectItem>
-                        <SelectItem value="inactive">Неактивне</SelectItem>
+                        <SelectItem value="all"><GlitchText intensity={isBuggyMode ? 0.6 : 0}>Всі статуси</GlitchText></SelectItem>
+                        <SelectItem value="active"><GlitchText intensity={isBuggyMode ? 0.6 : 0}>Активне</GlitchText></SelectItem>
+                        <SelectItem value="pending"><GlitchText intensity={isBuggyMode ? 0.6 : 0}>На розгляді</GlitchText></SelectItem>
+                        <SelectItem value="rejected"><GlitchText intensity={isBuggyMode ? 0.6 : 0}>Відхилено</GlitchText></SelectItem>
+                        <SelectItem value="inactive"><GlitchText intensity={isBuggyMode ? 0.6 : 0}>Неактивне</GlitchText></SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -693,32 +700,32 @@ const AdminPanel = () => {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Назва</TableHead>
-                            <TableHead>Автор</TableHead>
-                            <TableHead>Категорія</TableHead>
-                            <TableHead>Ціна</TableHead>
-                            <TableHead>Статус</TableHead>
-                            <TableHead>VIP</TableHead>
-                            <TableHead>Дата</TableHead>
-                            <TableHead>Дії</TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Назва</GlitchText></TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Автор</GlitchText></TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Категорія</GlitchText></TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Ціна</GlitchText></TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Статус</GlitchText></TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>VIP</GlitchText></TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Дата</GlitchText></TableHead>
+                            <TableHead><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Дії</GlitchText></TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {advertisements.map((ad) => (
-                            <TableRow key={ad.id}>
-                              <TableCell className="font-medium max-w-[200px] truncate">{ad.title}</TableCell>
+                            <TableRow key={ad.id} className={`${isBuggyMode ? 'animate-global-glitch' : ''}`}>
+                              <TableCell className="font-medium max-w-[200px] truncate"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>{ad.title}</GlitchText></TableCell>
                               <TableCell>
-                                {ad.users?.nickname}
+                                <GlitchText intensity={isBuggyMode ? 0.6 : 0}>{ad.users?.nickname}</GlitchText>
                                 {ad.users?.role !== "user" && (
-                                  <Badge variant="outline" className="ml-1 text-xs">
-                                    {ad.users?.role}
+                                  <Badge variant="outline" className={`ml-1 text-xs ${isBuggyMode ? 'animate-flicker' : ''}`}>
+                                    <GlitchText intensity={isBuggyMode ? 0.5 : 0}>{ad.users?.role}</GlitchText>
                                   </Badge>
                                 )}
                               </TableCell>
                               <TableCell>
-                                {ad.category}/{ad.subcategory}
+                                <GlitchText intensity={isBuggyMode ? 0.6 : 0}>{ad.category}/{ad.subcategory}</GlitchText>
                               </TableCell>
-                              <TableCell>₴{ad.price?.toLocaleString()}</TableCell>
+                              <TableCell><GlitchText intensity={isBuggyMode ? 0.8 : 0}>₴{ad.price?.toLocaleString()}</GlitchText></TableCell>
                               <TableCell>
                                 <Badge
                                   variant={
@@ -728,18 +735,19 @@ const AdminPanel = () => {
                                         ? "secondary"
                                         : "destructive"
                                   }
+                                  className={`${isBuggyMode ? 'animate-flicker' : ''}`}
                                 >
-                                  {ad.status}
+                                  <GlitchText intensity={isBuggyMode ? 0.7 : 0}>{ad.status}</GlitchText>
                                 </Badge>
                               </TableCell>
                               <TableCell>
                                 {ad.is_vip && (
-                                  <Badge variant="default" className="bg-yellow-500">
-                                    VIP
+                                  <Badge variant="default" className={`bg-yellow-500 ${isBuggyMode ? 'animate-flicker' : ''}`}>
+                                    <GlitchText intensity={isBuggyMode ? 0.7 : 0}>VIP</GlitchText>
                                   </Badge>
                                 )}
                               </TableCell>
-                              <TableCell>{new Date(ad.created_at).toLocaleDateString("uk-UA")}</TableCell>
+                              <TableCell><GlitchText intensity={isBuggyMode ? 0.6 : 0}>{new Date(ad.created_at).toLocaleDateString("uk-UA")}</GlitchText></TableCell>
                               <TableCell>
                                 <div className="flex space-x-2">
                                   <Button
@@ -747,6 +755,7 @@ const AdminPanel = () => {
                                     variant="outline"
                                     onClick={() => handlePromoteAd(ad.id, ad.is_vip)}
                                     title={ad.is_vip ? 'Зняти VIP статус' : 'Надати VIP статус'}
+                                    className={`${isBuggyMode ? 'animate-button-flicker' : ''}`}
                                   >
                                     <Crown className="w-4 h-4" />
                                   </Button>
@@ -755,6 +764,7 @@ const AdminPanel = () => {
                                     variant="destructive"
                                     onClick={() => handleDeleteAd(ad.id)}
                                     title="Видалити оголошення"
+                                    className={`${isBuggyMode ? 'animate-button-flicker' : ''}`}
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </Button>
@@ -773,7 +783,7 @@ const AdminPanel = () => {
                               <PaginationPrevious
                                 onClick={() => adPagination.goToPreviousPage()}
                                 className={
-                                  !adPagination.hasPreviousPage ? "pointer-events-none opacity-50" : "cursor-pointer"
+                                  !adPagination.hasPreviousPage ? "pointer-events-none opacity-50" : `cursor-pointer ${isBuggyMode ? 'animate-spin-slow' : ''}`
                                 }
                               />
                             </PaginationItem>
@@ -783,9 +793,9 @@ const AdminPanel = () => {
                                 <PaginationLink
                                   onClick={() => adPagination.goToPage(pageNumber)}
                                   isActive={pageNumber === adPagination.currentPage}
-                                  className="cursor-pointer"
+                                  className={`cursor-pointer ${isBuggyMode ? 'animate-flicker' : ''}`}
                                 >
-                                  {pageNumber}
+                                  <GlitchText intensity={isBuggyMode ? 0.5 : 0}>{pageNumber}</GlitchText>
                                 </PaginationLink>
                               </PaginationItem>
                             ))}
@@ -794,7 +804,7 @@ const AdminPanel = () => {
                               <PaginationNext
                                 onClick={() => adPagination.goToNextPage()}
                                 className={
-                                  !adPagination.hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"
+                                  !adPagination.hasNextPage ? "pointer-events-none opacity-50" : `cursor-pointer ${isBuggyMode ? 'animate-spin-reverse' : ''}`
                                 }
                               />
                             </PaginationItem>
@@ -809,32 +819,32 @@ const AdminPanel = () => {
 
             {user?.role === 'admin' && (
               <TabsContent value="logs" className="space-y-4">
-                <Card className="glass-card">
+                <Card className={`glass-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
                   <CardHeader>
-                    <CardTitle>Логи дій</CardTitle>
+                    <CardTitle><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Логи дій</GlitchText></CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       {logs.map((log) => (
                         <motion.div 
                           key={log.id} 
-                          className="p-4 border rounded-2xl hover:shadow-md transition-shadow bg-background-secondary glow-on-hover"
+                          className={`p-4 border rounded-2xl hover:shadow-md transition-shadow bg-background-secondary glow-on-hover ${isBuggyMode ? 'rotate-[0.5deg] scale-[1.01] transition-all duration-100' : ''}`}
                           whileHover={{ scale: 1.01 }}
                         >
                           <p className="font-medium text-foreground">
-                            <span className="font-bold">{log.users?.nickname || 'Невідомий'}</span> виконав дію: <Badge variant="outline">{log.action}</Badge>
+                            <span className="font-bold"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>{log.users?.nickname || 'Невідомий'}</GlitchText></span> виконав дію: <Badge variant="outline" className={`${isBuggyMode ? 'animate-flicker' : ''}`}><GlitchText intensity={isBuggyMode ? 0.7 : 0}>{log.action}</GlitchText></Badge>
                           </p>
                           {log.target_user && (
                             <p className="text-sm text-muted-foreground">
-                              Цільовий користувач: <span className="font-medium">{log.target_user.nickname}</span>
+                              <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Цільовий користувач: <span className="font-medium">{log.target_user.nickname}</span></GlitchText>
                             </p>
                           )}
                           <p className="text-xs text-muted-foreground">
-                            {new Date(log.created_at).toLocaleString('uk-UA')}
+                            <GlitchText intensity={isBuggyMode ? 0.5 : 0}>{new Date(log.created_at).toLocaleString('uk-UA')}</GlitchText>
                           </p>
                           {log.details && Object.keys(log.details).length > 0 && (
                             <p className="text-xs text-muted-foreground mt-1">
-                              Деталі: {JSON.stringify(log.details)}
+                              <GlitchText intensity={isBuggyMode ? 0.5 : 0}>Деталі: {JSON.stringify(log.details)}</GlitchText>
                             </p>
                           )}
                         </motion.div>

@@ -12,6 +12,8 @@ import { toast } from "sonner" // Corrected import to sonner
 import type { Database } from "@/integrations/supabase/types"
 import LiquidGrassBackground from "@/components/LiquidGrassBackground"
 import FloatingParticles from "@/components/FloatingParticles"
+import { useBuggyEffect } from "@/contexts/BuggyEffectContext" // Import useBuggyEffect
+import GlitchText from "@/components/GlitchText" // Import GlitchText
 
 type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"] & {
   users?: { nickname: string; role: string } | null
@@ -26,6 +28,7 @@ const Index = () => {
   })
   const [popularAds, setPopularAds] = useState<Advertisement[]>([])
   const [popularAdsLoading, setPopularAdsLoading] = useState(true)
+  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   useEffect(() => {
     fetchStats()
@@ -100,7 +103,7 @@ const Index = () => {
         <Hero />
 
         {/* About Section */}
-        <section className="py-16 bg-background-secondary/80 backdrop-blur-sm">
+        <section className={`py-16 bg-background-secondary/80 backdrop-blur-sm ${isBuggyMode ? 'animate-global-glitch' : ''}`}>
           <div className="container mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -109,10 +112,13 @@ const Index = () => {
               className="text-center mb-12"
             >
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Про <span className="bg-gradient-primary bg-clip-text text-transparent glow-text">Skoropad</span>
+                <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Про </GlitchText>
+                <span className="bg-gradient-primary bg-clip-text text-transparent glow-text">
+                  <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Skoropad</GlitchText>
+                </span>
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Ваш надійний партнер у світі онлайн оголошень та торгівлі
+                <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Ваш надійний партнер у світі онлайн оголошень та торгівлі</GlitchText>
               </p>
             </motion.div>
 
@@ -126,14 +132,14 @@ const Index = () => {
                   transition: { duration: 0.3 },
                 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="bg-card/80 backdrop-blur-sm rounded-3xl p-6 shadow-soft border border-border/50 hover:shadow-soft-lg hover:border-accent/20 transition-all duration-300 transform-gpu glow-card"
+                className={`bg-card/80 backdrop-blur-sm rounded-3xl p-6 shadow-soft border border-border/50 hover:shadow-soft-lg hover:border-accent/20 transition-all duration-300 transform-gpu glow-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <Users className="w-8 h-8 text-accent glow-icon" />
-                  <div className="text-2xl font-bold">{stats.totalUsers}</div>
+                  <Users className={`w-8 h-8 text-accent glow-icon ${isBuggyMode ? 'animate-spin-slow' : ''}`} />
+                  <div className="text-2xl font-bold"><GlitchText intensity={isBuggyMode ? 0.9 : 0}>{stats.totalUsers}</GlitchText></div>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">Користувачі</h3>
-                <p className="text-muted-foreground text-sm">Зареєстровані користувачі</p>
+                <h3 className="text-lg font-semibold mb-2"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Користувачі</GlitchText></h3>
+                <p className="text-muted-foreground text-sm"><GlitchText intensity={isBuggyMode ? 0.5 : 0}>Зареєстровані користувачі</GlitchText></p>
               </motion.div>
 
               <motion.div
@@ -145,14 +151,14 @@ const Index = () => {
                   transition: { duration: 0.3 },
                 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-card/80 backdrop-blur-sm rounded-3xl p-6 shadow-soft border border-border/50 hover:shadow-soft-lg hover:border-accent/20 transition-all duration-300 transform-gpu glow-card"
+                className={`bg-card/80 backdrop-blur-sm rounded-3xl p-6 shadow-soft border border-border/50 hover:shadow-soft-lg hover:border-accent/20 transition-all duration-300 transform-gpu glow-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <FileText className="w-8 h-8 text-primary glow-icon" />
-                  <div className="text-2xl font-bold">{stats.totalAds}</div>
+                  <FileText className={`w-8 h-8 text-primary glow-icon ${isBuggyMode ? 'animate-spin-reverse' : ''}`} />
+                  <div className="text-2xl font-bold"><GlitchText intensity={isBuggyMode ? 0.9 : 0}>{stats.totalAds}</GlitchText></div>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">Оголошення</h3>
-                <p className="text-muted-foreground text-sm">Всього оголошень</p>
+                <h3 className="text-lg font-semibold mb-2"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Оголошення</GlitchText></h3>
+                <p className="text-muted-foreground text-sm"><GlitchText intensity={isBuggyMode ? 0.5 : 0}>Всього оголошень</GlitchText></p>
               </motion.div>
 
               <motion.div
@@ -164,14 +170,14 @@ const Index = () => {
                   transition: { duration: 0.3 },
                 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="bg-card/80 backdrop-blur-sm rounded-3xl p-6 shadow-soft border border-border/50 hover:shadow-soft-lg hover:border-accent/20 transition-all duration-300 transform-gpu glow-card"
+                className={`bg-card/80 backdrop-blur-sm rounded-3xl p-6 shadow-soft border border-border/50 hover:shadow-soft-lg hover:border-accent/20 transition-all duration-300 transform-gpu glow-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <Star className="w-8 h-8 text-yellow-500 glow-icon" />
-                  <div className="text-2xl font-bold">{stats.vipAds}</div>
+                  <Star className={`w-8 h-8 text-yellow-500 glow-icon ${isBuggyMode ? 'animate-flicker' : ''}`} />
+                  <div className="text-2xl font-bold"><GlitchText intensity={isBuggyMode ? 0.9 : 0}>{stats.vipAds}</GlitchText></div>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">VIP оголошення</h3>
-                <p className="text-muted-foreground text-sm">Преміум оголошення</p>
+                <h3 className="text-lg font-semibold mb-2"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>VIP оголошення</GlitchText></h3>
+                <p className="text-muted-foreground text-sm"><GlitchText intensity={isBuggyMode ? 0.5 : 0}>Преміум оголошення</GlitchText></p>
               </motion.div>
 
               <motion.div
@@ -183,21 +189,21 @@ const Index = () => {
                   transition: { duration: 0.3 },
                 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                className="bg-card/80 backdrop-blur-sm rounded-3xl p-6 shadow-soft border border-border/50 hover:shadow-soft-lg hover:border-accent/20 transition-all duration-300 transform-gpu glow-card"
+                className={`bg-card/80 backdrop-blur-sm rounded-3xl p-6 shadow-soft border border-border/50 hover:shadow-soft-lg hover:border-accent/20 transition-all duration-300 transform-gpu glow-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <TrendingUp className="w-8 h-8 text-green-500 glow-icon" />
-                  <div className="text-2xl font-bold">{stats.recentAds}</div>
+                  <TrendingUp className={`w-8 h-8 text-green-500 glow-icon ${isBuggyMode ? 'animate-spin-fast' : ''}`} />
+                  <div className="text-2xl font-bold"><GlitchText intensity={isBuggyMode ? 0.9 : 0}>{stats.recentAds}</GlitchText></div>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">За тиждень</h3>
-                <p className="text-muted-foreground text-sm">Нових оголошень</p>
+                <h3 className="text-lg font-semibold mb-2"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>За тиждень</GlitchText></h3>
+                <p className="text-muted-foreground text-sm"><GlitchText intensity={isBuggyMode ? 0.5 : 0}>Нових оголошень</GlitchText></p>
               </motion.div>
             </div>
           </div>
         </section>
 
         {/* Featured Products Section */}
-        <section className="py-16 bg-background/80 backdrop-blur-sm">
+        <section className={`py-16 bg-background/80 backdrop-blur-sm ${isBuggyMode ? 'animate-global-glitch' : ''}`}>
           <div className="container mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -206,10 +212,13 @@ const Index = () => {
               className="text-center mb-12"
             >
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Популярні <span className="bg-gradient-accent bg-clip-text text-transparent glow-text">оголошення</span>
+                <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Популярні </GlitchText>
+                <span className="bg-gradient-accent bg-clip-text text-transparent glow-text">
+                  <GlitchText intensity={isBuggyMode ? 0.8 : 0}>оголошення</GlitchText>
+                </span>
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Ознайомтеся з нашими найкращими пропозиціями
+                <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Ознайомтеся з нашими найкращими пропозиціями</GlitchText>
               </p>
             </motion.div>
 
@@ -217,7 +226,7 @@ const Index = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="animate-pulse">
-                    <div className="bg-background-secondary/80 backdrop-blur-sm rounded-3xl h-80 w-full glow-card"></div>
+                    <div className={`bg-background-secondary/80 backdrop-blur-sm rounded-3xl h-80 w-full glow-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}></div>
                   </div>
                 ))}
               </div>
@@ -230,17 +239,21 @@ const Index = () => {
                     title={ad.title} // Changed from name to title
                     description={ad.description}
                     price={ad.price || 0}
-                    imageUrl={ad.images?.[0] || "https://via.placeholder.com/400x300?text=Без+фото"} // Changed from image to imageUrl
-                    isNew={false}
-                    isOnSale={false}
+                    images={ad.images} // Pass images array
+                    is_vip={ad.is_vip || false} // Pass is_vip
+                    views_count={ad.views_count || 0} // Pass views_count
+                    location={ad.location || ''} // Pass location
+                    created_at={ad.created_at} // Pass created_at
+                    users={ad.users} // Pass users
+                    condition={ad.condition || ''} // Pass condition
                     index={index}
                   />
                 ))}
               </div>
             ) : (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-8">
-                <h3 className="text-xl font-semibold mb-2">Поки що немає популярних оголошень</h3>
-                <p className="text-muted-foreground">Створіть перше оголошення, щоб воно з'явилося тут!</p>
+                <h3 className="text-xl font-semibold mb-2"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Поки що немає популярних оголошень</GlitchText></h3>
+                <p className="text-muted-foreground"><GlitchText intensity={isBuggyMode ? 0.6 : 0}>Створіть перше оголошення, щоб воно з'явилося тут!</GlitchText></p>
               </motion.div>
             )}
           </div>
