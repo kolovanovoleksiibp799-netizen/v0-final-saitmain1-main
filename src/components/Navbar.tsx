@@ -223,9 +223,8 @@ const Navbar = () => {
 
             <NavigationMenu>
               <NavigationMenuList>
-                {menuItems.map((menu, index) => (
+                {menuItems.map((menu) => (
                   <NavigationMenuItem key={menu.title}>
-                    {/* Removed motion.div wrapper here to allow shadcn/ui to handle hover */}
                     <NavigationMenuTrigger
                       className="text-muted-foreground hover:text-foreground bg-transparent hover:bg-background-secondary/50 transition-all duration-300 rounded-lg interactive-liquid glow-on-hover"
                     >
@@ -235,7 +234,7 @@ const Navbar = () => {
                     </NavigationMenuTrigger>
                     <NavigationMenuContent className="bg-card/90 backdrop-blur-xl border border-border/50 rounded-2xl shadow-soft-lg z-50 overflow-hidden">
                       <ul className="grid w-[400px] gap-3 p-4">
-                        {menu.items.map((item) => (
+                        {menu.items.map((item, itemIndex) => (
                           <li key={item.href}>
                             <NavigationMenuLink asChild>
                               <Link
