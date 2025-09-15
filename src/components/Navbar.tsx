@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, Menu, X, User, LogOut, Plus, Settings, Sun, Moon, ChevronDown } from "lucide-react"
+import { Search, Menu, X, User, LogOut, Plus, Settings, Sun, Moon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/contexts/AuthContext"
@@ -61,7 +61,7 @@ const Navbar = () => {
     setTheme(theme === "dark" ? "light" : "dark")
   }
 
-  const menuItems = [
+  const categoriesData = [
     {
       title: "Автомобілі",
       items: [
@@ -183,7 +183,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           <Link to="/">
             <motion.div
-              className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent cursor-pointer glow-text" // Added glow-text
+              className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent cursor-pointer glow-text"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2 }}
@@ -212,44 +212,38 @@ const Navbar = () => {
 
           {/* Desktop Navigation Menu */}
           <div className="hidden lg:flex items-center gap-6">
-            <motion.div variants={menuItemVariants} initial="initial" animate="animate" whileHover="hover">
-              <Link
-                to="/categories"
-                className="text-muted-foreground hover:text-accent transition-colors glow-on-hover"
-              >
-                Категорії
-              </Link>
-            </motion.div>
-
             <NavigationMenu>
               <NavigationMenuList>
-                {menuItems.map((menu) => (
-                  <NavigationMenuItem key={menu.title}>
-                    <NavigationMenuTrigger
-                      className="text-muted-foreground hover:text-foreground bg-transparent hover:bg-background-secondary/50 transition-all duration-300 rounded-lg interactive-liquid glow-on-hover"
-                    >
-                      <span className="flex items-center gap-1">
-                        {menu.title}
-                      </span>
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent className="bg-card/90 backdrop-blur-xl border border-border/50 rounded-2xl shadow-soft-lg z-50 overflow-hidden">
-                      <ul className="grid w-[400px] gap-3 p-4">
-                        {menu.items.map((item, itemIndex) => (
-                          <li key={item.href}>
-                            <NavigationMenuLink asChild>
-                              <Link
-                                to={item.href}
-                                className="block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-all duration-300 hover:bg-accent/10 hover:text-accent focus:bg-accent/10 focus:text-accent interactive-liquid glow-on-hover"
-                              >
-                                <div className="text-sm font-medium leading-none">{item.title}</div>
-                              </Link>
-                            </NavigationMenuLink>
-                          </li>
-                        ))}
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                ))}
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger
+                    className="text-muted-foreground hover:text-foreground bg-transparent hover:bg-background-secondary/50 transition-all duration-300 rounded-lg interactive-liquid glow-on-hover"
+                  >
+                    Категорії
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent className="bg-card/90 backdrop-blur-xl border border-border/50 rounded-2xl shadow-soft-lg z-50 overflow-hidden">
+                    <ul className="grid w-[600px] gap-3 p-4 md:w-[800px] md:grid-cols-4">
+                      {categoriesData.map((group) => (
+                        <li key={group.title} className="row-span-3">
+                          <p className="text-lg font-semibold mb-2 text-foreground">{group.title}</p>
+                          <ul className="space-y-1">
+                            {group.items.map((item) => (
+                              <li key={item.href}>
+                                <NavigationMenuLink asChild>
+                                  <Link
+                                    to={item.href}
+                                    className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent focus:bg-accent/10 focus:text-accent text-muted-foreground"
+                                  >
+                                    <div className="text-sm leading-none">{item.title}</div>
+                                  </Link>
+                                </NavigationMenuLink>
+                              </li>
+                            ))}
+                          </ul>
+                        </li>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
 
@@ -500,19 +494,9 @@ const Navbar = () => {
                   </motion.div>
                 )}
 
-                <motion.div variants={mobileItemVariants}>
-                  <Link
-                    to="/categories"
-                    className="block rounded-2xl px-4 py-3 bg-background-secondary text-foreground hover:scale-105 transition-transform interactive-liquid glow-on-hover"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Категорії
-                  </Link>
-                </motion.div>
-
                 {/* Mobile Categories */}
                 <motion.div className="space-y-2" variants={mobileItemVariants}>
-                  {menuItems.map((menu, index) => (
+                  {categoriesData.map((menu, index) => (
                     <motion.div
                       key={menu.title}
                       className="space-y-1"
