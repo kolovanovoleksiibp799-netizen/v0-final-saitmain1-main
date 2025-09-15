@@ -190,7 +190,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation Menu */}
           <div className="hidden lg:flex items-center gap-6">
-            <NavigationMenu>
+            <NavigationMenu className="no-indicator"> {/* Added no-indicator class here */}
               <NavigationMenuList>
                 {categoriesData.map((group) => (
                   <NavigationMenuItem key={group.title}>

@@ -437,6 +437,11 @@
     backface-visibility: hidden;
     perspective: 1000px;
   }
+
+  /* Custom CSS to hide the NavigationMenuIndicator */
+  .no-indicator > div[data-radix-collection-item][data-state="visible"] {
+    display: none !important;
+  }
 }
 
 /* Added new keyframe animations for liquid effects */
