@@ -439,7 +439,7 @@
   }
 
   /* Custom CSS to hide the NavigationMenuIndicator */
-  .no-indicator > div[data-radix-collection-item][data-state="visible"] {
+  .no-indicator [data-radix-navigation-menu-indicator] {
     display: none !important;
   }
 }
