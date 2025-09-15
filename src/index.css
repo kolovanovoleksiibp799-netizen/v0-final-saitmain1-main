@@ -1,0 +1,641 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ukrainian E-commerce Design System - Glassmorphism & Soft UI */
+
+@layer base {
+  :root {
+    /* Base Colors - Light Theme (Soft & Modern) */
+    --background: 220 25% 98%; /* Very light blue-gray */
+    --background-secondary: 220 25% 95%; /* Slightly darker light blue-gray */
+    --foreground: 220 20% 15%; /* Deep blue-gray for text */
+
+    /* Glassmorphism Base */
+    --glass-background: 0 0% 100%; /* Pure white for glass base */
+    --glass-opacity: 0.6; /* Default glass opacity */
+
+    /* Card System */
+    --card: 0 0% 100%; /* Pure white */
+    --card-foreground: 220 20% 15%; /* Deep blue-gray */
+    --card-shadow: 220 20% 70%; /* Soft grey for subtle shadow */
+
+    /* Primary Brand Color (Soft Blue) */
+    --primary: 210 80% 40%; /* Vibrant, but soft blue */
+    --primary-light: 210 80% 50%; /* Slightly lighter soft blue */
+    --primary-foreground: 0 0% 100%; /* White */
+
+    /* Accent Brand Color (Soft Teal/Mint) */
+    --accent: 170 70% 40%; /* Soft teal/mint */
+    --accent-light: 170 70% 50%; /* Lighter soft teal/mint */
+    --accent-foreground: 0 0% 100%; /* White */
+
+    /* Interactive Elements */
+    --secondary: 220 25% 90%; /* Light grey */
+    --secondary-foreground: 220 20% 15%; /* Deep blue-gray */
+
+    --muted: 220 25% 90%; /* Light grey */
+    --muted-foreground: 220 15% 45%; /* Medium grey */
+
+    /* Destructive Elements */
+    --destructive: 0 84.2% 60.2%; /* Red */
+    --destructive-foreground: 0 0% 100%; /* White */
+
+    /* Borders and Inputs */
+    --border: 220 20% 85%; /* Light grey border */
+    --input: 220 25% 90%; /* Light grey input background */
+    --ring: 170 70% 40%; /* Accent color for focus ring */
+
+    /* UI Enhancements */
+    --glow: 170 70% 40%; /* Accent color for glow */
+    --shadow-soft: 220 20% 70%; /* Soft shadow color */
+    --radius: 1.5rem; /* Standard border radius */
+    --radius-lg: 2rem; /* Larger border radius */
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-light)));
+    --gradient-soft: linear-gradient(135deg, hsl(var(--card)), hsl(var(--background-secondary)));
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-glow: box-shadow 0.3s ease, transform 0.3s ease;
+
+    /* Sidebar (if used) */
+    --sidebar-background: 220 25% 95%;
+    --sidebar-foreground: 220 20% 15%;
+    --sidebar-primary: 210 80% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 170 70% 40%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 20% 80%;
+    --sidebar-ring: 170 70% 40%;
+  }
+
+  .dark {
+    /* Base Colors - Dark Theme (Deep & Rich) */
+    --background: 220 20% 10%; /* Dark blue-gray */
+    --background-secondary: 220 20% 15%; /* Slightly lighter dark blue-gray */
+    --foreground: 220 25% 85%; /* Soft light blue-gray for text */
+
+    /* Glassmorphism Base - Dark Theme */
+    --glass-background: 220 20% 12%; /* Darker base for glass */
+    --glass-opacity: 0.4; /* Slightly lower opacity for dark glass */
+
+    /* Card System */
+    --card: 220 20% 12%; /* Darker card background */
+    --card-foreground: 220 25% 85%; /* Light text for cards */
+    --card-shadow: 220 20% 5%; /* Very dark for subtle shadow */
+
+    /* Primary Brand Color (Brighter Blue for contrast) */
+    --primary: 210 70% 50%;
+    --primary-light: 210 70% 60%;
+    --primary-foreground: 0 0% 100%; /* White */
+
+    /* Accent Brand Color (Brighter Teal/Mint for contrast) */
+    --accent: 170 60% 50%;
+    --accent-light: 170 60% 60%;
+    --accent-foreground: 0 0% 100%; /* White text on accent for better contrast */
+
+    /* Interactive Elements */
+    --secondary: 220 20% 20%; /* Darker secondary */
+    --secondary-foreground: 220 25% 85%; /* Light text */
+
+    --muted: 220 20% 20%; /* Darker muted */
+    --muted-foreground: 220 15% 60%; /* Medium gray for muted text */
+
+    /* Destructive Elements */
+    --destructive: 0 84.2% 60.2%; /* Red */
+    --destructive-foreground: 0 0% 100%; /* White */
+
+    /* Borders and Inputs */
+    --border: 220 20% 25%; /* Darker border */
+    --input: 220 20% 22%; /* Darker input background */
+    --ring: 170 60% 50%; /* New accent color */
+
+    /* UI Enhancements */
+    --glow: 170 60% 50%; /* New accent color */
+    --shadow-soft: 220 20% 5%; /* Darker shadow color */
+    /* Radius values remain unchanged */
+
+    /* Gradients for Dark Theme */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-light)));
+    --gradient-soft: linear-gradient(135deg, hsl(var(--card)), hsl(var(--background-secondary)));
+
+    /* Animations remain unchanged */
+
+    /* Sidebar for Dark Theme */
+    --sidebar-background: 220 20% 15%;
+    --sidebar-foreground: 220 25% 85%;
+    --sidebar-primary: 170 60% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 20% 20%;
+    --sidebar-accent-foreground: 220 25% 85%;
+    --sidebar-border: 220 20% 30%;
+    --sidebar-ring: 170 60% 50%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer components {
+  /* Glassmorphism Effect */
+  .glass-card {
+    background-color: hsl(var(--glass-background) / var(--glass-opacity));
+    backdrop-filter: blur(15px); /* Increased blur for more depth */
+    border: 1px solid hsl(var(--border) / 0.7); /* Slightly stronger border */
+    @apply shadow-soft-lg rounded-3xl;
+  }
+
+  /* Glow Effects */
+  .glow-accent {
+    box-shadow: 0 0 20px hsl(var(--glow) / 0.3);
+  }
+
+  .glow-accent-lg {
+    box-shadow: 0 0 40px hsl(var(--glow) / 0.4);
+  }
+
+  /* Stronger glow for interactive elements */
+  .glow-on-hover {
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  .glow-on-hover:hover {
+    box-shadow: var(--glow-strong); /* Using the new stronger glow */
+    transform: translateY(-3px) scale(1.02); /* Slightly more pronounced lift */
+  }
+
+  /* Soft Shadows */
+  .shadow-soft {
+    box-shadow: 0 10px 40px -10px hsl(var(--shadow-soft) / 0.3);
+  }
+
+  .shadow-soft-lg {
+    box-shadow: 0 25px 70px -15px hsl(var(--shadow-soft) / 0.45); /* Adjusted for more depth */
+  }
+
+  /* Interactive Elements */
+  .interactive-scale {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .interactive-scale:hover {
+    transform: scale(1.05) translateY(-2px);
+  }
+
+  /* Button Variants */
+  .btn-primary {
+    background: var(--gradient-primary);
+    color: hsl(var(--primary-foreground));
+    border-radius: var(--radius);
+    transition: var(--transition-glow);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 8px 25px hsl(var(--primary) / 0.3);
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  .btn-accent {
+    background: var(--gradient-accent);
+    color: hsl(var(--accent-foreground));
+    border-radius: var(--radius);
+    transition: var(--transition-glow);
+  }
+
+  .btn-accent:hover {
+    box-shadow: 0 8px 25px hsl(var(--accent) / 0.4);
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  /* Card Styles */
+  .card-soft {
+    background: var(--gradient-soft);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-smooth);
+  }
+
+  .card-soft:hover {
+    box-shadow: 0 20px 50px -15px hsl(var(--shadow-soft) / 0.4);
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  /* Enhanced animations */
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+  }
+
+  .animate-bounce-in {
+    animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  /* Liquid Grass Effects */
+  .liquid-grass-bg {
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.03) 0%,
+      rgba(5, 150, 105, 0.05) 25%,
+      rgba(4, 120, 87, 0.04) 50%,
+      rgba(6, 95, 70, 0.03) 75%,
+      rgba(4, 120, 87, 0.02) 100%
+    );
+    position: relative;
+    overflow: hidden;
+  }
+
+  .liquid-grass-bg::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(5, 150, 105, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(4, 120, 87, 0.06) 0%, transparent 50%);
+    animation: liquidFlow 20s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .liquid-grass-bg::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(16, 185, 129, 0.02) 50%, transparent 70%),
+      linear-gradient(-45deg, transparent 30%, rgba(5, 150, 105, 0.03) 50%, transparent 70%);
+    animation: liquidShimmer 15s ease-in-out infinite reverse;
+    pointer-events: none;
+  }
+
+  /* Enhanced Glow Effects */
+  .glow-emerald {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), 0 0 40px rgba(16, 185, 129, 0.2), 0 0 60px rgba(16, 185, 129, 0.1);
+  }
+
+  .glow-emerald-intense {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.4), 0 0 60px rgba(16, 185, 129, 0.3), 0 0 90px rgba(16, 185, 129, 0.2),
+      inset 0 0 20px rgba(16, 185, 129, 0.1);
+  }
+
+  .glow-pulse {
+    animation: glowPulse 3s ease-in-out infinite;
+  }
+
+  .glow-breathing {
+    animation: glowBreathe 4s ease-in-out infinite;
+  }
+
+  /* Floating Animation */
+  .float-gentle {
+    animation: floatGentle 6s ease-in-out infinite;
+  }
+
+  .float-dynamic {
+    animation: floatDynamic 4s ease-in-out infinite;
+  }
+
+  /* Liquid Morphing */
+  .liquid-morph {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    animation: liquidMorph 8s ease-in-out infinite;
+  }
+
+  /* Advanced Interactive Effects */
+  .interactive-liquid {
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .interactive-liquid::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.2), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .interactive-liquid:hover::before {
+    left: 100%;
+  }
+
+  .interactive-liquid:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2), 0 0 60px rgba(16, 185, 129, 0.3);
+    border-radius: 50% 60% 40% 70% / 60% 40% 60% 50%;
+  }
+
+  /* New Classes for Advanced Glow Animations and Effects */
+  .glow-text {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  .glow-card {
+    animation: card-glow 4s ease-in-out infinite;
+  }
+
+  .glow-icon {
+    animation: icon-glow 2s ease-in-out infinite;
+  }
+
+  .liquid-grass {
+    animation: liquid-flow 20s ease-in-out infinite;
+  }
+
+  .floating-element {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .particle {
+    animation: particle-float 8s ease-in-out infinite;
+  }
+
+  /* Backdrop blur support */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .backdrop-blur {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Enhanced gradient backgrounds */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  }
+
+  .bg-gradient-accent {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  }
+
+  .bg-gradient-secondary {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  }
+
+  /* Improved shadow system */
+  .shadow-soft {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .shadow-soft-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Transform GPU acceleration */
+  .transform-gpu {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* Responsive improvements */
+  @media (max-width: 768px) {
+    .glow-text {
+      animation-duration: 2s;
+    }
+
+    .glow-card {
+      animation-duration: 3s;
+    }
+
+    .liquid-grass {
+      animation-duration: 15s;
+    }
+  }
+
+  /* Dark mode enhancements */
+  @media (prefers-color-scheme: dark) {
+    .glow-text {
+      text-shadow: 0 0 10px rgba(59, 130, 246, 0.6), 0 0 20px rgba(59, 130, 246, 0.4), 0 0 30px rgba(59, 130, 246, 0.2);
+    }
+
+    .glow-card {
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.15), 0 0 50px rgba(59, 130, 246, 0.08);
+    }
+  }
+
+  /* Performance optimizations */
+  .liquid-grass,
+  .floating-element,
+  .particle {
+    will-change: transform;
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+}
+
+/* Added new keyframe animations for liquid effects */
+@keyframes liquidFlow {
+  0%,
+  100% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: translateX(20px) translateY(-10px) rotate(1deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateX(-10px) translateY(15px) rotate(-0.5deg);
+    opacity: 0.9;
+  }
+  75% {
+    transform: translateX(15px) translateY(-5px) rotate(0.8deg);
+    opacity: 0.7;
+  }
+}
+
+@keyframes liquidShimmer {
+  0%,
+  100% {
+    transform: translateX(-20px) scaleX(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateX(20px) scaleX(1.1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), 0 0 40px rgba(16, 185, 129, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.5), 0 0 80px rgba(16, 185, 129, 0.3), 0 0 120px rgba(16, 185, 129, 0.1);
+  }
+}
+
+@keyframes glowBreathe {
+  0%,
+  100% {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2), 0 0 30px rgba(16, 185, 129, 0.1);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.4), 0 0 50px rgba(16, 185, 129, 0.2), 0 0 75px rgba(16, 185, 129, 0.1);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes floatGentle {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+}
+
+@keyframes floatDynamic {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) translateX(4px) rotate(0.5deg);
+  }
+  75% {
+    transform: translateY(-12px) translateX(-4px) rotate(-0.5deg);
+  }
+}
+
+@keyframes liquidMorph {
+  0%,
+  100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  25% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+  50% {
+    border-radius: 50% 30% 60% 40% / 30% 70% 40% 50%;
+  }
+  75% {
+    border-radius: 40% 70% 30% 60% / 70% 40% 60% 30%;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    text-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.3), 0 0 15px rgba(59, 130, 246, 0.2);
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.8), 0 0 20px rgba(59, 130, 246, 0.6), 0 0 30px rgba(59, 130, 246, 0.4);
+  }
+}
+
+@keyframes card-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.1), 0 0 40px rgba(59, 130, 246, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.2), 0 0 60px rgba(59, 130, 246, 0.1);
+  }
+}
+
+@keyframes icon-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.6));
+  }
+}
+
+@keyframes liquid-flow {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(-50%) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateX(-50%) translateY(-50%) rotate(90deg) scale(1.1);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-50%) rotate(180deg) scale(0.9);
+  }
+  75% {
+    transform: translateX(-50%) translateY(-50%) rotate(270deg) scale(1.05);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes particle-float {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  33% {
+    transform: translateY(-10px) translateX(5px);
+  }
+  66% {
+    transform: translateY(5px) translateX(-5px);
+  }
+}
