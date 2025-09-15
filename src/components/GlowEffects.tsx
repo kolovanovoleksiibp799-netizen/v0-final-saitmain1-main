@@ -116,11 +116,10 @@ export const RippleGlow = ({ trigger = false, color = "#10b981", className = "" 
 interface TrailGlowProps {
   children: React.ReactNode
   color?: string
-  trailLength?: number
   className?: string
 }
 
-export const TrailGlow = ({ children, color = "#10b981", trailLength = 20, className = "" }: TrailGlowProps) => {
+export const TrailGlow = ({ children, color = "#10b981", className = "" }: TrailGlowProps) => {
   const trailRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

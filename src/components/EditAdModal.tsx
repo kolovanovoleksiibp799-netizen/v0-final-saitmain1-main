@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, type FC } from 'react';
 import { X, Upload, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,7 +30,7 @@ interface EditAdModalProps {
   onSuccess: () => void;
 }
 
-const EditAdModal: React.FC<EditAdModalProps> = ({ isOpen, onClose, advertisement, onSuccess }) => {
+const EditAdModal: FC<EditAdModalProps> = ({ isOpen, onClose, advertisement, onSuccess }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<string[]>([]);
@@ -123,7 +122,7 @@ const EditAdModal: React.FC<EditAdModalProps> = ({ isOpen, onClose, advertisemen
       const fileExt = file.name.split('.').pop();
       const fileName = `${user?.id}/${Date.now()}.${fileExt}`;
       
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('advertisement-images')
         .upload(fileName, file);
 

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Search, Ban, Shield, Crown, Trash2, Eye, Users, FileText, BarChart3, Download, ExternalLink, UserCheck, UserX } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Crown, Trash2, Users, FileText, UserCheck, UserX, MessageSquare } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { toast } from 'sonner'; // Corrected import to sonner
 import { useAuth } from '@/contexts/AuthContext';
 import { hasPermission, updateUserRole, banUser, giveVipStatus } from '@/lib/auth';
@@ -383,29 +391,6 @@ const AdminPanel = () => {
       fetchAdvertisements();
     } catch (error: any) {
       toast.error('Помилка видалення оголошення: ' + error.message);
-    }
-  };
-
-  const exportData = async () => {
-    try {
-      const data = {
-        users: users,
-        advertisements: advertisements,
-        logs: logs,
-        timestamp: new Date().toISOString()
-      };
-      
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `skoropad-data-${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      
-      toast.success('Дані експортовано успішно');
-    } catch (error: any) {
-      toast.error('Помилка експорту: ' + error.message);
     }
   };
 

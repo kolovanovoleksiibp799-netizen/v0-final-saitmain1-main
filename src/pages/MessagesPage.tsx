@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Send, User, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -10,10 +10,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useMessages } from '@/contexts/MessagesContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { uk } from 'date-fns/locale';
-import { toast } from 'sonner'; // Corrected import to sonner
 
 const MessagesPage = () => {
   const navigate = useNavigate();

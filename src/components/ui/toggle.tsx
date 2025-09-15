@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import * as TogglePrimitive from '@radix-ui/react-toggle'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
@@ -28,18 +27,67 @@ const toggleVariants = cva(
   },
 )
 
-const Toggle = React.forwardRef<
-  React.ElementRef<typeof TogglePrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof TogglePrimitive.Root> &
-    VariantProps<typeof toggleVariants>
->(({ className, variant, size, ...props }, ref) => (
-  <TogglePrimitive.Root
-    ref={ref}
-    className={cn(toggleVariants({ variant, size, className }))}
-    {...props}
-  />
-))
+interface ToggleProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'>,
+    VariantProps<typeof toggleVariants> {
+  pressed?: boolean
+  onPressedChange?: (pressed: boolean) => void
+}
 
-Toggle.displayName = TogglePrimitive.Root.displayName
+const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
+  (
+    {
+      className,
+      variant,
+      size,
+      pressed: pressedProp,
+      onPressedChange,
+      onClick,
+      type,
+      ...props
+    },
+    ref,
+  ) => {
+    const [pressed, setPressed] = React.useState<boolean>(pressedProp ?? false)
+
+    React.useEffect(() => {
+      if (pressedProp !== undefined) {
+        setPressed(pressedProp)
+      }
+    }, [pressedProp])
+
+    const handleClick = React.useCallback<
+      React.MouseEventHandler<HTMLButtonElement>
+    >(
+      (event) => {
+        onClick?.(event)
+        if (event.defaultPrevented) {
+          return
+        }
+
+        const next = !pressed
+        if (pressedProp === undefined) {
+          setPressed(next)
+        }
+        onPressedChange?.(next)
+      },
+      [onClick, onPressedChange, pressed, pressedProp],
+    )
+
+    return (
+      <button
+        type={type ?? 'button'}
+        ref={ref}
+        data-state={pressed ? 'on' : 'off'}
+        aria-pressed={pressed}
+        className={cn(toggleVariants({ variant, size, className }))}
+        onClick={handleClick}
+        {...props}
+      />
+    )
+  },
+)
+
+Toggle.displayName = 'Toggle'
 
 export { Toggle, toggleVariants }
