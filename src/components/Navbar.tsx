@@ -236,29 +236,24 @@ const Navbar = () => {
                       >
                         <span className="flex items-center gap-1">
                           {menu.title}
+                          {/* ChevronDown is handled internally by NavigationMenuTrigger */}
                         </span>
                       </NavigationMenuTrigger>
                       <NavigationMenuContent className="bg-card/90 backdrop-blur-xl border border-border/50 rounded-2xl shadow-soft-lg z-50 overflow-hidden">
-                        <div
-                          className="grid w-[400px] gap-3 p-4"
-                        >
-                          {menu.items.map((item, itemIndex) => (
-                            <NavigationMenuLink key={item.href} asChild>
-                              <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: itemIndex * 0.05 }}
-                              >
+                        <ul className="grid w-[400px] gap-3 p-4">
+                          {menu.items.map((item) => (
+                            <li key={item.href}>
+                              <NavigationMenuLink asChild>
                                 <Link
                                   to={item.href}
                                   className="block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-all duration-300 hover:bg-accent/10 hover:text-accent focus:bg-accent/10 focus:text-accent interactive-liquid glow-on-hover"
                                 >
                                   <div className="text-sm font-medium leading-none">{item.title}</div>
                                 </Link>
-                              </motion.div>
-                            </NavigationMenuLink>
+                              </NavigationMenuLink>
+                            </li>
                           ))}
-                        </div>
+                        </ul>
                       </NavigationMenuContent>
                     </motion.div>
                   </NavigationMenuItem>
