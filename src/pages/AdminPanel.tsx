@@ -1,118 +1,309 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Search, Ban, Shield, Crown, Trash2, Eye, Users, FileText, BarChart3, Download, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Search, Ban, Shield, Crown, Trash2, Eye, Users, FileText, BarChart3, Download, ExternalLink, UserCheck, UserX } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import { toast } from 'sonner'; // Corrected import to sonner
 import { useAuth } from '@/contexts/AuthContext';
+import { hasPermission, updateUserRole, banUser, giveVipStatus } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast'; // Corrected import
-import { hasPermission } from '@/lib/auth';
+import { usePagination } from '@/hooks/use-pagination'; // Assuming this hook is correct and available
+
+interface UserProfile {
+  id: string;
+  nickname: string;
+  email: string;
+  role: 'user' | 'vip' | 'moderator' | 'admin';
+  is_banned: boolean;
+  created_at: string;
+}
+
+interface Advertisement {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  category: string;
+  subcategory: string;
+  status: string;
+  is_vip: boolean;
+  views_count: number;
+  created_at: string;
+  user_id: string;
+  users?: {
+    nickname: string;
+    role: string;
+  };
+}
+
+interface AdminLog {
+  id: string;
+  admin_id: string | null;
+  action: string;
+  target_user_id: string | null;
+  details: any | null;
+  created_at: string;
+  users?: { nickname: string } | null;
+  target_user?: { nickname: string } | null;
+}
+
+interface AdminStats {
+  totalUsers: number;
+  totalAds: number;
+  activeAds: number;
+  vipUsers: number;
+  bannedUsers: number;
+  todayRegistrations: number;
+  todayAds: number;
+  totalMessages: number;
+}
 
 const AdminPanel = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const [users, setUsers] = useState([]);
-  const [advertisements, setAdvertisements] = useState([]);
-  const [logs, setLogs] = useState([]);
-  const [userSearchQuery, setUserSearchQuery] = useState('');
-  const [adSearchQuery, setAdSearchQuery] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState({
+
+  // State management
+  const [stats, setStats] = useState<AdminStats>({
     totalUsers: 0,
     totalAds: 0,
+    activeAds: 0,
     vipUsers: 0,
-    bannedUsers: 0
+    bannedUsers: 0,
+    todayRegistrations: 0,
+    todayAds: 0,
+    totalMessages: 0,
   });
 
-  useEffect(() => {
-    if (authLoading) {
-      return;
-    }
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
+  const [logs, setLogs] = useState<AdminLog[]>([]);
+  const [totalUsersCount, setTotalUsersCount] = useState(0);
+  const [totalAdsCount, setTotalAdsCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
-    if (!user || !hasPermission(user, ['admin', 'moderator'])) {
-      navigate('/');
-      return;
+  // Search and filter states
+  const [userSearch, setUserSearch] = useState("");
+  const [userRoleFilter, setUserRoleFilter] = useState("all");
+  const [adSearch, setAdSearch] = useState("");
+  const [adStatusFilter, setAdStatusFilter] = useState("all");
+
+  // Pagination hooks
+  const userPagination = usePagination({
+    totalItems: totalUsersCount,
+    itemsPerPage: 20,
+    initialPage: 1,
+  });
+
+  const adPagination = usePagination({
+    totalItems: totalAdsCount,
+    itemsPerPage: 20,
+    initialPage: 1,
+  });
+
+  // Memoized filter options
+  const userFilters = useMemo(
+    () => ({
+      search: userSearch,
+      role: userRoleFilter === "all" ? undefined : userRoleFilter,
+    }),
+    [userSearch, userRoleFilter],
+  );
+
+  const adFilters = useMemo(
+    () => ({
+      search: adSearch,
+      status: adStatusFilter === "all" ? undefined : adStatusFilter,
+    }),
+    [adSearch, adStatusFilter],
+  );
+
+  // Fetch functions with optimization
+  const fetchAdminStats = useCallback(async () => {
+    try {
+      const today = new Date().toISOString().split("T")[0];
+
+      const [
+        { count: totalUsers },
+        { count: totalAds },
+        { count: activeAds },
+        { count: vipUsers },
+        { count: bannedUsers },
+        { count: todayRegistrations },
+        { count: todayAds },
+        { count: totalMessages },
+      ] = await Promise.all([
+        supabase.from("users").select("*", { count: "exact", head: true }),
+        supabase.from("advertisements").select("*", { count: "exact", head: true }),
+        supabase.from("advertisements").select("*", { count: "exact", head: true }).eq("status", "active"),
+        supabase.from("users").select("*", { count: "exact", head: true }).eq("role", "vip"),
+        supabase.from("users").select("*", { count: "exact", head: true }).eq("is_banned", true),
+        supabase.from("users").select("*", { count: "exact", head: true }).gte("created_at", today),
+        supabase.from("advertisements").select("*", { count: "exact", head: true }).gte("created_at", today),
+        supabase.from("messages").select("*", { count: "exact", head: true }),
+      ]);
+
+      setStats({
+        totalUsers: totalUsers || 0,
+        totalAds: totalAds || 0,
+        activeAds: activeAds || 0,
+        vipUsers: vipUsers || 0,
+        bannedUsers: bannedUsers || 0,
+        todayRegistrations: todayRegistrations || 0,
+        todayAds: todayAds || 0,
+        totalMessages: totalMessages || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      toast.error("Не вдалося завантажити статистику");
     }
-    
-    const initAndFetch = async () => {
-      const { initializeUserContext } = await import('@/lib/auth');
-      await initializeUserContext();
-      
-      // Debug RLS context
-      console.log("Debugging RLS context...");
-      const { data: rlsDebugData, error: rlsDebugError } = await supabase.rpc('debug_rls_context');
-      if (rlsDebugError) {
-        console.error("Error debugging RLS context:", rlsDebugError);
-      } else {
-        console.log("RLS Context Debug Data:", rlsDebugData);
+  }, []);
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      let query = supabase
+        .from("users")
+        .select("*", { count: "exact" })
+        .order("created_at", { ascending: false })
+        .range((userPagination.currentPage - 1) * userPagination.itemsPerPage, userPagination.currentPage * userPagination.itemsPerPage - 1);
+
+      if (userFilters.search) {
+        query = query.or(`nickname.ilike.%${userFilters.search}%,email.ilike.%${userFilters.search}%`);
+      }
+      if (userFilters.role) {
+        query = query.eq("role", userFilters.role);
       }
 
-      fetchData();
-    };
-    
-    initAndFetch();
-  }, [user, authLoading, navigate]);
+      const { data, error, count } = await query;
 
-  const fetchData = async () => {
-    setLoading(true);
+      if (error) throw error;
+
+      setUsers(data || []);
+      setTotalUsersCount(count || 0);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast.error("Не вдалося завантажити користувачів");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userPagination.currentPage, userPagination.itemsPerPage, userFilters]);
+
+  const fetchAdvertisements = useCallback(async () => {
     try {
-      // Fetch users
-      const { data: usersData } = await supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      // Fetch advertisements
-      const { data: adsData } = await supabase
-        .from('advertisements')
+      setIsLoading(true);
+      let query = supabase
+        .from("advertisements")
+        .select(`*, users (nickname, role)`)
+        .order("created_at", { ascending: false })
+        .range((adPagination.currentPage - 1) * adPagination.itemsPerPage, adPagination.currentPage * adPagination.itemsPerPage - 1);
+
+      if (adFilters.search) {
+        query = query.or(`title.ilike.%${adFilters.search}%,description.ilike.%${adFilters.search}%`);
+      }
+      if (adFilters.status) {
+        query = query.eq("status", adFilters.status);
+      }
+
+      const { data, error, count } = await query;
+
+      if (error) throw error;
+
+      setAdvertisements(data || []);
+      setTotalAdsCount(count || 0);
+    } catch (error) {
+      console.error("Error fetching advertisements:", error);
+      toast.error("Не вдалося завантажити оголошення");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [adPagination.currentPage, adPagination.itemsPerPage, adFilters]);
+
+  const fetchLogs = useCallback(async () => {
+    if (user?.role !== 'admin') return;
+    try {
+      const { data, error } = await supabase
+        .from('admin_logs')
         .select(`
           *,
-          users (nickname, role)
+          users!admin_logs_admin_id_fkey (nickname),
+          target_user:users!admin_logs_target_user_id_fkey (nickname)
         `)
-        .order('created_at', { ascending: false });
-
-      // Fetch logs (admin only)
-      if (user?.role === 'admin') {
-        const { data: logsData } = await supabase
-          .from('admin_logs')
-          .select(`
-            *,
-            users!admin_logs_admin_id_fkey (nickname),
-            target_user:users!admin_logs_target_user_id_fkey (nickname)
-          `)
-          .order('created_at', { ascending: false })
-          .limit(50);
-        
-        setLogs(logsData || []);
-      }
-
-      setUsers(usersData || []);
-      setAdvertisements(adsData || []);
-
-      // Calculate stats
-      if (usersData) {
-        setStats({
-          totalUsers: usersData.length,
-          totalAds: adsData?.length || 0,
-          vipUsers: usersData.filter(u => u.role === 'vip').length,
-          bannedUsers: usersData.filter(u => u.is_banned).length
-        });
-      }
-    } catch (error: any) {
-      toast({
-        title: 'Помилка завантаження даних: ' + error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      setLogs(data || []);
+    } catch (error) {
+      console.error('Error fetching logs:', error);
+      toast.error('Не вдалося завантажити логи');
     }
-  };
+  }, [user]);
+
+  // Debounced search function (simple version for demonstration)
+  const debounce = useCallback((func: Function, delay: number) => {
+    let timeoutId: NodeJS.Timeout;
+    return (...args: any[]) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func.apply(null, args), delay);
+    };
+  }, []);
+
+  const debouncedUserSearch = useMemo(
+    () =>
+      debounce(() => {
+        userPagination.goToPage(1);
+        fetchUsers();
+      }, 500),
+    [fetchUsers, userPagination],
+  );
+
+  const debouncedAdSearch = useMemo(
+    () =>
+      debounce(() => {
+        adPagination.goToPage(1);
+        fetchAdvertisements();
+      }, 500),
+    [fetchAdvertisements, adPagination],
+  );
+
+  // Effects
+  useEffect(() => {
+    if (!authLoading && (!user || !hasPermission(user, ["admin", "moderator"]))) {
+      navigate("/");
+      return;
+    }
+
+    if (user && hasPermission(user, ["admin", "moderator"])) {
+      fetchAdminStats();
+      fetchUsers();
+      fetchAdvertisements();
+      if (user.role === 'admin') {
+        fetchLogs();
+      }
+    }
+  }, [user, authLoading, navigate, fetchAdminStats, fetchUsers, fetchAdvertisements, fetchLogs]);
+
+  useEffect(() => {
+    debouncedUserSearch();
+  }, [userSearch, userRoleFilter, debouncedUserSearch]);
+
+  useEffect(() => {
+    debouncedAdSearch();
+  }, [adSearch, adStatusFilter, debouncedAdSearch]);
 
   const logAction = async (action: string, targetUserId?: string, details?: any) => {
     try {
@@ -129,106 +320,76 @@ const AdminPanel = () => {
     }
   };
 
-  const handleUserAction = async (targetUserId: string, action: string, newRole?: string) => {
-    console.log('Attempting user action:', action, 'on targetUserId:', targetUserId, 'newRole:', newRole, 'by user:', user);
+  const handleUserAction = async (targetUserId: string, action: string, value?: any) => {
     try {
-      let updateData = {};
-      
-      if (action === 'ban') {
-        updateData = { is_banned: true };
-      } else if (action === 'unban') {
-        updateData = { is_banned: false };
-      } else if (action === 'role' && newRole) {
-        updateData = { role: newRole };
+      let result;
+      switch (action) {
+        case "ban":
+          result = await banUser(targetUserId, value);
+          break;
+        case "role":
+          result = await updateUserRole(targetUserId, value);
+          break;
+        case "vip":
+          result = await giveVipStatus(targetUserId, value || 30);
+          break;
+        default:
+          return;
       }
 
-      const { error } = await supabase
-        .from('users')
-        .update(updateData)
-        .eq('id', targetUserId);
-
-      if (error) {
-        console.error('Supabase user update error:', error);
-        throw error;
+      if (result.error) {
+        throw new Error(result.error.message);
       }
 
-      await logAction(`${action}${newRole ? `_${newRole}` : ''}`, targetUserId, { action, newRole });
-
-      toast({
-        title: 'Дію виконано успішно',
-        variant: 'success',
-      });
-      fetchData();
+      toast.success("Дію виконано успішно");
+      await logAction(`${action}${value ? `_${value}` : ''}`, targetUserId, { action, value });
+      fetchUsers();
+      fetchAdminStats();
     } catch (error: any) {
-      toast({
-        title: 'Помилка виконання дії: ' + error.message,
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleDeleteAd = async (adId: string) => {
-    if (!confirm('Ви впевнені, що хочете видалити це оголошення?')) return;
-
-    console.log('Attempting to delete ad:', adId, 'by user:', user);
-    try {
-      const { error } = await supabase
-        .from('advertisements')
-        .delete()
-        .eq('id', adId);
-
-      if (error) {
-        console.error('Supabase delete error:', error);
-        throw error;
-      }
-
-      await logAction('delete_advertisement', undefined, { advertisement_id: adId });
-
-      toast({
-        title: 'Оголошення видалено',
-        variant: 'success',
-      });
-      fetchData();
-    } catch (error: any) {
-      toast({
-        title: 'Помилка видалення оголошення: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error(error.message);
     }
   };
 
   const handlePromoteAd = async (adId: string, isVip: boolean) => {
-    console.log('Attempting to promote/demote ad:', adId, 'isVip:', isVip, 'by user:', user);
     try {
       const { error } = await supabase
         .from('advertisements')
         .update({ is_vip: !isVip })
         .eq('id', adId);
 
-      if (error) {
-        console.error('Supabase update error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
+      toast.success(isVip ? 'VIP статус знято' : 'Надано VIP статус');
       await logAction(isVip ? 'demote_advertisement' : 'promote_advertisement', undefined, { advertisement_id: adId });
-      
-      toast({
-        title: isVip ? 'VIP статус знято' : 'Надано VIP статус',
-        variant: 'success',
-      });
-      fetchData();
+      fetchAdvertisements();
     } catch (error: any) {
-      toast({
-        title: 'Помилка зміни статусу: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка зміни статусу: ' + error.message);
+    }
+  };
+
+  const handleDeleteAd = async (adId: string) => {
+    if (!confirm('Ви впевнені, що хочете видалити це оголошення?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('advertisements')
+        .delete()
+        .eq('id', adId);
+
+      if (error) throw error;
+
+      toast.success('Оголошення видалено');
+      await logAction('delete_advertisement', undefined, { advertisement_id: adId });
+      fetchAdvertisements();
+    } catch (error: any) {
+      toast.error('Помилка видалення оголошення: ' + error.message);
     }
   };
 
   const exportData = async () => {
     try {
       const data = {
-        users: users.map(u => ({ ...u, password_hash: undefined })),
+        users: users,
         advertisements: advertisements,
         logs: logs,
         timestamp: new Date().toISOString()
@@ -242,38 +403,16 @@ const AdminPanel = () => {
       a.click();
       URL.revokeObjectURL(url);
       
-      toast({
-        title: 'Дані експортовано успішно',
-        variant: 'success',
-      });
+      toast.success('Дані експортовано успішно');
     } catch (error: any) {
-      toast({
-        title: 'Помилка експорту: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка експорту: ' + error.message);
     }
   };
 
-  const filteredUsers = users.filter(u =>
-    u.nickname.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
-    u.role.toLowerCase().includes(userSearchQuery.toLowerCase())
-  );
-
-  const filteredAds = advertisements.filter(ad =>
-    ad.title.toLowerCase().includes(adSearchQuery.toLowerCase()) ||
-    ad.description.toLowerCase().includes(adSearchQuery.toLowerCase()) ||
-    ad.users?.nickname.toLowerCase().includes(adSearchQuery.toLowerCase())
-  );
-
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="pt-24 pb-16 text-center">
-          <h1 className="text-2xl font-bold mb-4">Завантаження...</h1>
-          <p className="text-muted-foreground">Перевірка прав доступу</p>
-        </div>
-        <Footer />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-accent"></div>
       </div>
     );
   }
@@ -292,346 +431,422 @@ const AdminPanel = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <section className="pt-24 pb-16">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
-              <Button
-                variant="ghost"
-                onClick={() => navigate(-1)}
-                className="mb-6 glow-on-hover"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Назад
-              </Button>
-            </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background p-6">
+      <div className="container mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8"
+        >
+          <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
+            Адміністративна панель
+          </h1>
+          <p className="text-muted-foreground">Управління користувачами та оголошеннями Skoropad</p>
+        </motion.div>
 
-            <div className="flex items-center justify-between mb-8">
-              <h1 className="text-3xl font-bold">
-                Адмін <span className="bg-gradient-primary bg-clip-text text-transparent">панель</span>
-              </h1>
-              <Badge variant="outline" className="text-sm">
-                {user.role === 'admin' ? 'Адміністратор' : 'Модератор'}
-              </Badge>
-            </div>
+        {/* Stats Cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+        >
+          <Card className="glass-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Всього користувачів</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalUsers}</div>
+              <p className="text-xs text-muted-foreground">+{stats.todayRegistrations} сьогодні</p>
+            </CardContent>
+          </Card>
 
-            <div className="flex justify-between items-center mb-6">
-              <div></div>
-              {user.role === 'admin' && (
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
-                  <Button onClick={exportData} variant="outline" className="rounded-2xl hover:shadow-glow glow-on-hover">
-                    <Download className="w-4 h-4 mr-2" />
-                    Експорт даних
-                  </Button>
-                </motion.div>
+          <Card className="glass-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Всього оголошень</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalAds}</div>
+              <p className="text-xs text-muted-foreground">+{stats.todayAds} сьогодні</p>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">VIP користувачі</CardTitle>
+              <Crown className="h-4 w-4 text-yellow-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.vipUsers}</div>
+              <p className="text-xs text-muted-foreground">Активні VIP</p>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Повідомлення</CardTitle>
+              <MessageSquare className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalMessages}</div>
+              <p className="text-xs text-muted-foreground">Всього повідомлень</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Main Content with Tabs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <Tabs defaultValue="users" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+              <TabsTrigger value="users">Користувачі</TabsTrigger>
+              <TabsTrigger value="ads">Оголошення</TabsTrigger>
+              {user?.role === 'admin' && (
+                <TabsTrigger value="logs">Логи</TabsTrigger>
               )}
-            </div>
+            </TabsList>
 
-            <Tabs defaultValue="stats" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4 bg-background-secondary rounded-2xl shadow-soft">
-                <TabsTrigger value="stats" className="flex items-center gap-2 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-glow rounded-2xl transition-all duration-300 glow-on-hover">
-                  <BarChart3 className="w-4 h-4" />
-                  Статистика
-                </TabsTrigger>
-                <TabsTrigger value="users" className="flex items-center gap-2 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-glow rounded-2xl transition-all duration-300 glow-on-hover">
-                  <Users className="w-4 h-4" />
-                  Користувачі
-                </TabsTrigger>
-                <TabsTrigger value="ads" className="flex items-center gap-2 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-glow rounded-2xl transition-all duration-300 glow-on-hover">
-                  <FileText className="w-4 h-4" />
-                  Оголошення
-                </TabsTrigger>
-                {user.role === 'admin' && (
-                  <TabsTrigger value="logs" className="flex items-center gap-2 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-glow rounded-2xl transition-all duration-300 glow-on-hover">
-                    <Eye className="w-4 h-4" />
-                    Логи
-                  </TabsTrigger>
-                )}
-              </TabsList>
+            <TabsContent value="users" className="space-y-6">
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle>Управління користувачами</CardTitle>
+                  <CardDescription>Перегляд та управління користувачами платформи</CardDescription>
 
-              <TabsContent value="stats" className="space-y-6">
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <motion.div whileHover={{ y: -5, scale: 1.02 }} transition={{ duration: 0.3 }}>
-                    <Card className="glass-card glow-on-hover">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium">Користувачі</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">{stats.totalUsers}</div>
-                        <p className="text-xs text-muted-foreground">Всього зареєстровано</p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                  
-                  <motion.div whileHover={{ y: -5, scale: 1.02 }} transition={{ duration: 0.3 }}>
-                    <Card className="glass-card glow-on-hover">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium">Оголошення</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">{stats.totalAds}</div>
-                        <p className="text-xs text-muted-foreground">Всього створено</p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                  
-                  <motion.div whileHover={{ y: -5, scale: 1.02 }} transition={{ duration: 0.3 }}>
-                    <Card className="glass-card glow-on-hover">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium">VIP користувачі</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold text-accent">{stats.vipUsers}</div>
-                        <p className="text-xs text-muted-foreground">Активні VIP</p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                  
-                  <motion.div whileHover={{ y: -5, scale: 1.02 }} transition={{ duration: 0.3 }}>
-                    <Card className="glass-card glow-on-hover">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium">Заблоковані</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold text-destructive">{stats.bannedUsers}</div>
-                        <p className="text-xs text-muted-foreground">Заблоковані користувачі</p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="users" className="space-y-4">
-                <Card className="glass-card">
-                  <CardHeader>
-                    <CardTitle>Управління користувачами</CardTitle>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
+                  {/* Search and Filter Controls */}
+                  <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                       <Input
-                        value={userSearchQuery}
-                        onChange={(e) => setUserSearchQuery(e.target.value)}
-                        placeholder="Пошук користувачів за нікнеймом або роллю..."
-                        className="pl-10 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+                        placeholder="Пошук користувачів..."
+                        value={userSearch}
+                        onChange={(e) => setUserSearch(e.target.value)}
+                        className="pl-10"
                       />
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {filteredUsers.map((targetUser) => (
-                        <motion.div 
-                          key={targetUser.id} 
-                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-2xl hover:shadow-md transition-shadow bg-background-secondary glow-on-hover"
-                          whileHover={{ scale: 1.01 }}
-                        >
-                          <div className="flex-1 mb-2 sm:mb-0">
-                            <p className="font-medium flex items-center gap-2 text-foreground">
-                              {targetUser.nickname}
-                              {targetUser.role === 'vip' && <Badge className="bg-accent text-accent-foreground">VIP</Badge>}
-                              {targetUser.role === 'moderator' && <Badge variant="secondary">Модератор</Badge>}
-                              {targetUser.role === 'admin' && <Badge variant="destructive">Адмін</Badge>}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              Статус: {targetUser.is_banned ? 'Заблокований' : 'Активний'} | 
-                              Дата реєстрації: {new Date(targetUser.created_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="flex gap-2 flex-wrap justify-end">
-                            <Link to={`/profile/${targetUser.id}`}>
-                              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  title="Переглянути профіль"
-                                  className="rounded-xl glow-on-hover"
+                    <Select value={userRoleFilter} onValueChange={setUserRoleFilter}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Фільтр за роллю" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Всі ролі</SelectItem>
+                        <SelectItem value="user">Користувач</SelectItem>
+                        <SelectItem value="vip">VIP</SelectItem>
+                        <SelectItem value="moderator">Модератор</SelectItem>
+                        <SelectItem value="admin">Адміністратор</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {isLoading ? (
+                    <div className="flex items-center justify-center h-32">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+                    </div>
+                  ) : (
+                    <>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Нікнейм</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Роль</TableHead>
+                            <TableHead>Статус</TableHead>
+                            <TableHead>Дата реєстрації</TableHead>
+                            <TableHead>Дії</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {users.map((targetUser) => (
+                            <TableRow key={targetUser.id}>
+                              <TableCell className="font-medium">{targetUser.nickname}</TableCell>
+                              <TableCell>{targetUser.email || "Не вказано"}</TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant={
+                                    targetUser.role === "admin"
+                                      ? "destructive"
+                                      : targetUser.role === "vip"
+                                        ? "default"
+                                        : targetUser.role === "moderator"
+                                          ? "secondary"
+                                          : "outline"
+                                  }
                                 >
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                              </motion.div>
-                            </Link>
-                            {user.role === 'admin' && targetUser.role !== 'admin' && (
-                              <>
-                                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
+                                  {targetUser.role.toUpperCase()}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant={targetUser.is_banned ? "destructive" : "default"}>
+                                  {targetUser.is_banned ? "Заблокований" : "Активний"}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>{new Date(targetUser.created_at).toLocaleDateString("uk-UA")}</TableCell>
+                              <TableCell>
+                                <div className="flex space-x-2">
                                   <Button
+                                    variant={targetUser.is_banned ? "default" : "destructive"}
                                     size="sm"
+                                    onClick={() => handleUserAction(targetUser.id, "ban", !targetUser.is_banned)}
+                                  >
+                                    {targetUser.is_banned ? <UserCheck className="w-4 h-4" /> : <UserX className="w-4 h-4" />}
+                                  </Button>
+                                  <Button
                                     variant="outline"
-                                    onClick={() => handleUserAction(targetUser.id, 'role', 'vip')}
-                                    disabled={targetUser.role === 'vip'}
-                                    title="Зробити VIP"
-                                    className="rounded-xl glow-on-hover"
+                                    size="sm"
+                                    onClick={() => handleUserAction(targetUser.id, "vip", 30)}
                                   >
                                     <Crown className="w-4 h-4" />
                                   </Button>
-                                </motion.div>
-                                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+
+                      {/* Pagination */}
+                      <div className="mt-6">
+                        <Pagination>
+                          <PaginationContent>
+                            <PaginationItem>
+                              <PaginationPrevious
+                                onClick={() => userPagination.goToPreviousPage()}
+                                className={
+                                  !userPagination.hasPreviousPage ? "pointer-events-none opacity-50" : "cursor-pointer"
+                                }
+                              />
+                            </PaginationItem>
+
+                            {userPagination.getPageNumbers().map((pageNumber) => (
+                              <PaginationItem key={pageNumber}>
+                                <PaginationLink
+                                  onClick={() => userPagination.goToPage(pageNumber)}
+                                  isActive={pageNumber === userPagination.currentPage}
+                                  className="cursor-pointer"
+                                >
+                                  {pageNumber}
+                                </PaginationLink>
+                              </PaginationItem>
+                            ))}
+
+                            <PaginationItem>
+                              <PaginationNext
+                                onClick={() => userPagination.goToNextPage()}
+                                className={
+                                  !userPagination.hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"
+                                }
+                              />
+                            </PaginationItem>
+                          </PaginationContent>
+                        </Pagination>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="ads" className="space-y-6">
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle>Управління оголошеннями</CardTitle>
+                  <CardDescription>Перегляд та модерація оголошень</CardDescription>
+
+                  {/* Search and Filter Controls */}
+                  <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Input
+                        placeholder="Пошук оголошень..."
+                        value={adSearch}
+                        onChange={(e) => setAdSearch(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    <Select value={adStatusFilter} onValueChange={setAdStatusFilter}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Фільтр за статусом" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Всі статуси</SelectItem>
+                        <SelectItem value="active">Активне</SelectItem>
+                        <SelectItem value="pending">На розгляді</SelectItem>
+                        <SelectItem value="rejected">Відхилено</SelectItem>
+                        <SelectItem value="inactive">Неактивне</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {isLoading ? (
+                    <div className="flex items-center justify-center h-32">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+                    </div>
+                  ) : (
+                    <>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Назва</TableHead>
+                            <TableHead>Автор</TableHead>
+                            <TableHead>Категорія</TableHead>
+                            <TableHead>Ціна</TableHead>
+                            <TableHead>Статус</TableHead>
+                            <TableHead>VIP</TableHead>
+                            <TableHead>Дата</TableHead>
+                            <TableHead>Дії</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {advertisements.map((ad) => (
+                            <TableRow key={ad.id}>
+                              <TableCell className="font-medium max-w-[200px] truncate">{ad.title}</TableCell>
+                              <TableCell>
+                                {ad.users?.nickname}
+                                {ad.users?.role !== "user" && (
+                                  <Badge variant="outline" className="ml-1 text-xs">
+                                    {ad.users?.role}
+                                  </Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {ad.category}/{ad.subcategory}
+                              </TableCell>
+                              <TableCell>₴{ad.price?.toLocaleString()}</TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant={
+                                    ad.status === "active"
+                                      ? "default"
+                                      : ad.status === "pending"
+                                        ? "secondary"
+                                        : "destructive"
+                                  }
+                                >
+                                  {ad.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                {ad.is_vip && (
+                                  <Badge variant="default" className="bg-yellow-500">
+                                    VIP
+                                  </Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>{new Date(ad.created_at).toLocaleDateString("uk-UA")}</TableCell>
+                              <TableCell>
+                                <div className="flex space-x-2">
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => handleUserAction(targetUser.id, 'role', 'moderator')}
-                                    disabled={targetUser.role === 'moderator'}
-                                    title="Зробити Модератором"
-                                    className="rounded-xl glow-on-hover"
+                                    onClick={() => handlePromoteAd(ad.id, ad.is_vip)}
+                                    title={ad.is_vip ? 'Зняти VIP статус' : 'Надати VIP статус'}
                                   >
-                                    <Shield className="w-4 h-4" />
+                                    <Crown className="w-4 h-4" />
                                   </Button>
-                                </motion.div>
-                              </>
-                            )}
-                            {targetUser.role !== 'admin' && (
-                              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
-                                <Button
-                                  size="sm"
-                                  variant={targetUser.is_banned ? "default" : "destructive"}
-                                  onClick={() => handleUserAction(
-                                    targetUser.id, 
-                                    targetUser.is_banned ? 'unban' : 'ban'
-                                  )}
-                                  title={targetUser.is_banned ? 'Розблокувати' : 'Заблокувати'}
-                                  className="rounded-xl glow-on-hover"
-                                >
-                                  <Ban className="w-4 h-4" />
-                                </Button>
-                              </motion.div>
-                            )}
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => handleDeleteAd(ad.id)}
+                                    title="Видалити оголошення"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
 
-              <TabsContent value="ads" className="space-y-4">
+                      {/* Pagination */}
+                      <div className="mt-6">
+                        <Pagination>
+                          <PaginationContent>
+                            <PaginationItem>
+                              <PaginationPrevious
+                                onClick={() => adPagination.goToPreviousPage()}
+                                className={
+                                  !adPagination.hasPreviousPage ? "pointer-events-none opacity-50" : "cursor-pointer"
+                                }
+                              />
+                            </PaginationItem>
+
+                            {adPagination.getPageNumbers().map((pageNumber) => (
+                              <PaginationItem key={pageNumber}>
+                                <PaginationLink
+                                  onClick={() => adPagination.goToPage(pageNumber)}
+                                  isActive={pageNumber === adPagination.currentPage}
+                                  className="cursor-pointer"
+                                >
+                                  {pageNumber}
+                                </PaginationLink>
+                              </PaginationItem>
+                            ))}
+
+                            <PaginationItem>
+                              <PaginationNext
+                                onClick={() => adPagination.goToNextPage()}
+                                className={
+                                  !adPagination.hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"
+                                }
+                              />
+                            </PaginationItem>
+                          </PaginationContent>
+                        </Pagination>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {user?.role === 'admin' && (
+              <TabsContent value="logs" className="space-y-4">
                 <Card className="glass-card">
                   <CardHeader>
-                    <CardTitle>Управління оголошеннями</CardTitle>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
-                      <Input
-                        value={adSearchQuery}
-                        onChange={(e) => setAdSearchQuery(e.target.value)}
-                        placeholder="Пошук оголошень за назвою, описом або автором..."
-                        className="pl-10 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
-                      />
-                    </div>
+                    <CardTitle>Логи дій</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {filteredAds.map((ad) => (
+                      {logs.map((log) => (
                         <motion.div 
-                          key={ad.id} 
-                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-2xl hover:shadow-md transition-shadow bg-background-secondary glow-on-hover"
+                          key={log.id} 
+                          className="p-4 border rounded-2xl hover:shadow-md transition-shadow bg-background-secondary glow-on-hover"
                           whileHover={{ scale: 1.01 }}
                         >
-                          <div className="flex-1 mb-2 sm:mb-0">
-                            <div className="flex items-center gap-2 mb-2">
-                              <p className="font-medium text-foreground">{ad.title}</p>
-                              {ad.is_vip && <Badge className="bg-accent text-accent-foreground">VIP</Badge>}
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              Автор: {ad.users?.nickname} | 
-                              Категорія: {ad.category}/{ad.subcategory}
+                          <p className="font-medium text-foreground">
+                            <span className="font-bold">{log.users?.nickname || 'Невідомий'}</span> виконав дію: <Badge variant="outline">{log.action}</Badge>
+                          </p>
+                          {log.target_user && (
+                            <p className="text-sm text-muted-foreground">
+                              Цільовий користувач: <span className="font-medium">{log.target_user.nickname}</span>
                             </p>
-                            <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
-                              {ad.description}
+                          )}
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(log.created_at).toLocaleString('uk-UA')}
+                          </p>
+                          {log.details && Object.keys(log.details).length > 0 && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Деталі: {JSON.stringify(log.details)}
                             </p>
-                            <div className="flex gap-2 text-xs text-muted-foreground">
-                              {ad.discord_contact && <span>Discord: {ad.discord_contact}</span>}
-                              {ad.telegram_contact && <span>Telegram: {ad.telegram_contact}</span>}
-                            </div>
-                          </div>
-                          <div className="flex gap-2 flex-wrap justify-end ml-0 sm:ml-4">
-                            <Link to={`/advertisement/${ad.id}`}>
-                              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  title="Переглянути оголошення"
-                                  className="rounded-xl glow-on-hover"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                              </motion.div>
-                            </Link>
-                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
-                              <Button
-                                size="sm"
-                                variant={ad.is_vip ? "outline" : "default"}
-                                onClick={() => handlePromoteAd(ad.id, ad.is_vip)}
-                                title={ad.is_vip ? 'Зняти VIP статус' : 'Надати VIP статус'}
-                                className="rounded-xl glow-on-hover"
-                              >
-                                <Crown className="w-4 h-4" />
-                              </Button>
-                            </motion.div>
-                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleDeleteAd(ad.id)}
-                                title="Видалити оголошення"
-                                className="rounded-xl glow-on-hover"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </motion.div>
-                          </div>
+                          )}
                         </motion.div>
                       ))}
                     </div>
                   </CardContent>
                 </Card>
               </TabsContent>
-
-              {user.role === 'admin' && (
-                <TabsContent value="logs" className="space-y-4">
-                  <Card className="glass-card">
-                    <CardHeader>
-                      <CardTitle>Логи дій</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {logs.map((log) => (
-                          <motion.div 
-                            key={log.id} 
-                            className="p-4 border rounded-2xl hover:shadow-md transition-shadow bg-background-secondary glow-on-hover"
-                            whileHover={{ scale: 1.01 }}
-                          >
-                            <p className="font-medium text-foreground">
-                              <span className="font-bold">{log.users?.nickname || 'Невідомий'}</span> виконав дію: <Badge variant="outline">{log.action}</Badge>
-                            </p>
-                            {log.target_user && (
-                              <p className="text-sm text-muted-foreground">
-                                Цільовий користувач: <span className="font-medium">{log.target_user.nickname}</span>
-                              </p>
-                            )}
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(log.created_at).toLocaleString('uk-UA')}
-                            </p>
-                            {log.details && Object.keys(log.details).length > 0 && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Деталі: {JSON.stringify(log.details)}
-                              </p>
-                            )}
-                          </motion.div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              )}
-            </Tabs>
-          </motion.div>
-        </div>
-      </section>
-
-      <Footer />
+            )}
+          </Tabs>
+        </motion.div>
+      </div>
     </div>
   );
 };

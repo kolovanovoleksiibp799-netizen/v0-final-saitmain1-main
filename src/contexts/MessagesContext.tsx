@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner'; // Corrected import to sonner
 
 interface Message {
   id: string;
@@ -118,10 +118,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       setUnreadCount(totalUnread);
     } catch (error: any) {
-      toast({
-        title: 'Помилка завантаження розмов: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка завантаження розмов: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -139,16 +136,13 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       setMessages(data || []);
     } catch (error: any) {
-      toast({
-        title: 'Помилка завантаження повідомлень: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка завантаження повідомлень: ' + error.message);
     }
   };
 
   const sendMessage = async (receiverId: string, content: string, advertisementId?: string) => {
     if (!user) {
-      toast({ title: 'Ви не авторизовані', variant: 'destructive' });
+      toast.error('Ви не авторизовані');
       return;
     }
     try {
@@ -168,15 +162,9 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // Refresh conversations to update last message and unread counts
       await fetchConversations();
       
-      toast({
-        title: 'Повідомлення надіслано',
-        variant: 'success',
-      });
+      toast.success('Повідомлення надіслано');
     } catch (error: any) {
-      toast({
-        title: 'Помилка надсилання повідомлення: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка надсилання повідомлення: ' + error.message);
     }
   };
 
@@ -191,10 +179,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // Refresh conversations to update unread counts
       await fetchConversations();
     } catch (error: any) {
-      toast({
-        title: 'Помилка позначення повідомлень як прочитаних: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка позначення повідомлень як прочитаних: ' + error.message);
     }
   };
 
@@ -213,8 +198,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         (payload) => {
           const newMessage = payload.new as Message;
           
-          toast({
-            title: 'Нове повідомлення',
+          toast.info('Нове повідомлення', {
             description: newMessage.content,
             action: {
               label: 'Переглянути',

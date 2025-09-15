@@ -8,8 +8,8 @@ import Footer from "@/components/Footer"
 import { supabase } from "@/integrations/supabase/client"
 import { Users, FileText, Star, TrendingUp } from "lucide-react"
 import ProductCard from "@/components/ProductCard"
-import { toast } from "@/hooks/use-toast" // Corrected import
-import type { Database } from "@/integrations/supabase/types" // Import Database type
+import { toast } from "sonner" // Corrected import to sonner
+import type { Database } from "@/integrations/supabase/types"
 import LiquidGrassBackground from "@/components/LiquidGrassBackground"
 import FloatingParticles from "@/components/FloatingParticles"
 
@@ -82,10 +82,7 @@ const Index = () => {
 
       setPopularAds(data || [])
     } catch (error: any) {
-      toast({
-        title: "Помилка завантаження популярних оголошень: " + error.message,
-        variant: "destructive",
-      })
+      toast.error("Помилка завантаження популярних оголошень: " + error.message)
     } finally {
       setPopularAdsLoading(false)
     }
@@ -230,10 +227,10 @@ const Index = () => {
                   <ProductCard
                     key={ad.id}
                     id={ad.id}
-                    name={ad.title}
+                    title={ad.title} // Changed from name to title
                     description={ad.description}
                     price={ad.price || 0}
-                    image={ad.images?.[0] || "https://via.placeholder.com/400x300?text=Без+фото"}
+                    imageUrl={ad.images?.[0] || "https://via.placeholder.com/400x300?text=Без+фото"} // Changed from image to imageUrl
                     isNew={false}
                     isOnSale={false}
                     index={index}

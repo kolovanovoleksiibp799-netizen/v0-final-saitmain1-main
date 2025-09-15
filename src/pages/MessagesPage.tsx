@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { uk } from 'date-fns/locale';
+import { toast } from 'sonner'; // Corrected import to sonner
 
 const MessagesPage = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const MessagesPage = () => {
       fetchMessages(activeConversation);
       markAsRead(activeConversation);
     }
-  }, [activeConversation, fetchMessages, markAsRead]); // Added fetchMessages and markAsRead to dependencies
+  }, [activeConversation, fetchMessages, markAsRead]);
 
   useEffect(() => {
     scrollToBottom();
@@ -69,7 +70,7 @@ const MessagesPage = () => {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="pt-24 pb-16 text-center">
-          <h1 className="text-2xl font-bold mb-4">Увійдіть в акаунт</h1>
+          <h1 className="text-2xl font-bold mb-4">Увійти в акаунт</h1>
           <p className="text-muted-foreground">Для перегляду повідомлень потрібно увійти в акаунт</p>
         </div>
         <Footer />
@@ -104,7 +105,7 @@ const MessagesPage = () => {
               <span className="bg-gradient-primary bg-clip-text text-transparent">Повідомлення</span>
             </h1>
 
-            <Card className="glass-card overflow-hidden"> {/* Changed to glass-card */}
+            <Card className="glass-card overflow-hidden">
               <CardContent className="p-0 flex h-[calc(100vh-200px)]">
                 {/* Conversations sidebar */}
                 <div className="w-full md:w-1/3 border-r border-border/50 flex flex-col">

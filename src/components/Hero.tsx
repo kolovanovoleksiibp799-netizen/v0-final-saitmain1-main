@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast'; // Corrected import
+import { toast } from 'sonner'; // Corrected import to sonner
 import { useAuth } from '@/contexts/AuthContext';
 import { hasPermission } from '@/lib/auth';
 
@@ -16,10 +16,7 @@ const Hero = () => {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) {
-      toast({
-        title: 'Введіть пошуковий запит',
-        variant: 'destructive',
-      });
+      toast.error('Введіть пошуковий запит');
       return;
     }
 
@@ -38,18 +35,12 @@ const Hero = () => {
       if (error) throw error;
 
       // Для демонстрації показуємо кількість знайдених результатів
-      toast({
-        title: `Знайдено ${data?.length || 0} оголошень`,
-        variant: 'success',
-      });
+      toast.success(`Знайдено ${data?.length || 0} оголошень`);
       
       // В реальній реалізації тут би був перехід на сторінку результатів пошуку
       console.log('Search results:', data);
     } catch (error: any) {
-      toast({
-        title: 'Помилка пошуку: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка пошуку: ' + error.message);
     }
   };
 
@@ -112,7 +103,7 @@ const Hero = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Пошук оголошень..."
-                className="pl-12 py-6 text-lg border-0 bg-white/10 dark:bg-background-secondary/50 backdrop-blur-sm rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+                className="pl-12 py-6 text-lg border-0 bg-white/10 dark:bg-background-secondary/50 backdrop-blur-sm rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background interactive-liquid glow-breathing"
               />
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
                 <Button

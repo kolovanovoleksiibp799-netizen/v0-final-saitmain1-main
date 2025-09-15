@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/contexts/AuthContext"
 import { logoutUser, hasPermission } from "@/lib/auth"
 import AuthModal from "./AuthModal"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner" // Corrected import to sonner
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -40,23 +40,21 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const handleLogout = () => {
-    logoutUser()
-    setUser(null)
-    toast({
-      title: "Ви вийшли з акаунту",
-      variant: "success",
-    })
+  const handleLogout = async () => {
+    const { error } = await logoutUser()
+    if (error) {
+      toast.error("Помилка виходу: " + error)
+    } else {
+      setUser(null)
+      toast.success("Ви вийшли з акаунту")
+    }
   }
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
       // TODO: Implement search functionality
-      toast({
-        title: `Пошук: ${searchQuery}`,
-        variant: "info",
-      })
+      toast.info(`Пошук: ${searchQuery}`)
     }
   }
 
@@ -252,7 +250,7 @@ const Navbar = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Пошук оголошень..."
-                className="pl-10 border-0 bg-background-secondary/70 dark:bg-background-secondary/50 backdrop-blur-sm rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background interactive-liquid glow-breathing"
+                className="pl-10 border-0 bg-background-secondary/70 dark:bg-background-secondary/50 backdrop-blur-sm rounded-2xl interactive-liquid glow-breathing"
               />
             </form>
           </motion.div>

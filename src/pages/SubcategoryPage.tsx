@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast'; // Corrected import
-import ContactButton from '@/components/ContactButton'; // Import ContactButton
+import { toast } from 'sonner'; // Corrected import to sonner
+import ContactButton from '@/components/ContactButton';
 
 interface Advertisement {
   id: string;
@@ -104,10 +104,7 @@ const SubcategoryPage = () => {
 
       setAdvertisements(data || []);
     } catch (error: any) {
-      toast({
-        title: 'Помилка завантаження оголошень: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка завантаження оголошень: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -153,7 +150,7 @@ const SubcategoryPage = () => {
             {loading ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
-                  <Card key={i} className="animate-pulse glass-card"> {/* Changed to glass-card */}
+                  <Card key={i} className="animate-pulse glass-card">
                     <CardContent className="p-6">
                       <div className="h-48 bg-background-secondary rounded-2xl mb-4"></div>
                       <div className="h-4 bg-background-secondary rounded mb-2"></div>
@@ -178,7 +175,7 @@ const SubcategoryPage = () => {
                           : ad.users?.role === 'admin'
                           ? 'border-red-400 shadow-red-400/20 bg-gradient-to-br from-red-50/5 to-red-100/10'
                           : ''
-                      } glow-on-hover`}> {/* Changed to glass-card */}
+                      } glow-on-hover`}>
                         <CardContent className="p-0">
                           {/* Image */}
                           {ad.images && ad.images.length > 0 && (

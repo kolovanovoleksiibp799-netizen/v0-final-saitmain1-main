@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast'; // Corrected import
+import { toast } from 'sonner'; // Corrected import to sonner
 
 const CreateAdPage = () => {
   const navigate = useNavigate();
@@ -69,26 +69,17 @@ const CreateAdPage = () => {
 
   const handleFileUpload = async (file: File) => {
     if (images.length >= 10) {
-      toast({
-        title: 'Максимум 10 зображень',
-        variant: 'destructive',
-      });
+      toast.error('Максимум 10 зображень');
       return;
     }
 
     if (!file.type.startsWith('image/')) {
-      toast({
-        title: 'Можна завантажувати лише зображення',
-        variant: 'destructive',
-      });
+      toast.error('Можна завантажувати лише зображення');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: 'Розмір файлу не повинен перевищувати 5MB',
-        variant: 'destructive',
-      });
+      toast.error('Розмір файлу не повинен перевищувати 5MB');
       return;
     }
 
@@ -111,15 +102,9 @@ const CreateAdPage = () => {
         .getPublicUrl(fileName);
 
       setImages([...images, publicUrl]);
-      toast({
-        title: 'Зображення завантажено успішно!',
-        variant: 'success',
-      });
+      toast.success('Зображення завантажено успішно!');
     } catch (error: any) {
-      toast({
-        title: 'Помилка завантаження: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка завантаження: ' + error.message);
     } finally {
       const newUploadingImages = [...uploadingImages];
       newUploadingImages.pop();
@@ -134,10 +119,7 @@ const CreateAdPage = () => {
         setImages([...images, imageUrl.trim()]);
       }
     } else {
-      toast({
-        title: 'Максимум 10 зображень',
-        variant: 'destructive',
-      });
+      toast.error('Максимум 10 зображень');
     }
   };
 
@@ -161,26 +143,17 @@ const CreateAdPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      toast({
-        title: 'Увійдіть в акаунт для створення оголошення',
-        variant: 'destructive',
-      });
+      toast.error('Увійдіть в акаунт для створення оголошення');
       return;
     }
 
     if (!formData.category || !formData.subcategory || !formData.title || !formData.description) {
-      toast({
-        title: 'Заповніть всі обов\'язкові поля',
-        variant: 'destructive',
-      });
+      toast.error('Заповніть всі обов\'язкові поля');
       return;
     }
 
     if (!formData.discord_contact && !formData.telegram_contact) {
-      toast({
-        title: 'Вкажіть хоча б один контакт (Discord або Telegram)',
-        variant: 'destructive',
-      });
+      toast.error('Вкажіть хоча б один контакт (Discord або Telegram)');
       return;
     }
 
@@ -201,16 +174,10 @@ const CreateAdPage = () => {
 
       if (error) throw error;
 
-      toast({
-        title: 'Оголошення створено успішно!',
-        variant: 'success',
-      });
+      toast.success('Оголошення створено успішно!');
       navigate('/');
     } catch (error: any) {
-      toast({
-        title: 'Помилка при створенні оголошення: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка при створенні оголошення: ' + error.message);
     } finally {
       setLoading(false);
     }

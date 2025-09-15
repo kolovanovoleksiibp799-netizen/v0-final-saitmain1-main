@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useMessages } from '@/contexts/MessagesContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast'; // Corrected import
+import { toast } from 'sonner'; // Corrected import to sonner
 
 interface ContactButtonProps {
   userId: string;
@@ -22,18 +22,12 @@ const ContactButton: React.FC<ContactButtonProps> = ({ userId, userName, adverti
 
   const handleSendMessage = async () => {
     if (!user) {
-      toast({
-        title: 'Увійдіть в акаунт для відправки повідомлень',
-        variant: 'destructive',
-      });
+      toast.info('Увійдіть в акаунт для відправки повідомлень');
       return;
     }
 
     if (!message.trim()) {
-      toast({
-        title: 'Введіть повідомлення',
-        variant: 'destructive',
-      });
+      toast.error('Введіть повідомлення');
       return;
     }
 
@@ -41,15 +35,9 @@ const ContactButton: React.FC<ContactButtonProps> = ({ userId, userName, adverti
       await sendMessage(userId, message, advertisementId);
       setIsOpen(false);
       setMessage('');
-      toast({
-        title: 'Повідомлення надіслано',
-        variant: 'success',
-      });
+      toast.success('Повідомлення надіслано');
     } catch (error: any) {
-      toast({
-        title: 'Помилка надсилання повідомлення: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка надсилання повідомлення: ' + error.message);
     }
   };
 
@@ -58,10 +46,7 @@ const ContactButton: React.FC<ContactButtonProps> = ({ userId, userName, adverti
       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
         <Button 
           className="btn-accent rounded-2xl glow-on-hover"
-          onClick={() => toast({
-            title: 'Увійдіть в акаунт для відправки повідомлень',
-            variant: 'info',
-          })}
+          onClick={() => toast.info('Увійдіть в акаунт для відправки повідомлень')}
         >
           <MessageCircle className="w-4 h-4 mr-2" />
           Написати
@@ -80,7 +65,7 @@ const ContactButton: React.FC<ContactButtonProps> = ({ userId, userName, adverti
           </Button>
         </motion.div>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] glass-card"> {/* Changed to glass-card */}
+      <DialogContent className="sm:max-w-[425px] glass-card">
         <DialogHeader>
           <DialogTitle>Написати {userName}</DialogTitle>
         </DialogHeader>

@@ -3,26 +3,16 @@ import { supabase } from '@/integrations/supabase/client';
 export interface User {
   id: string;
   nickname: string;
+  email: string; // Add email to User interface
   role: 'user' | 'vip' | 'moderator' | 'admin';
   is_banned: boolean;
   created_at: string;
+  avatar_url?: string; // Add avatar_url
+  phone?: string; // Add phone
+  location?: string; // Add location
+  bio?: string; // Add bio
+  vip_expires_at?: string; // Add vip_expires_at
 }
-
-export interface AuthState {
-  user: User | null;
-  loading: boolean;
-}
-
-// Simple hash function for passwords
-const simpleHash = (str: string): string => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash).toString(16);
-};
 
 // Set user context for RLS via RPC
 export const setUserContext = async (userId: string | null) => {
@@ -40,85 +30,134 @@ export const setUserContext = async (userId: string | null) => {
   }
 };
 
-// Register user
-export const registerUser = async (nickname: string, password: string) => {
+// Register user with Supabase Auth and create profile
+export const registerUser = async (nickname: string, email: string, password: string) => {
   try {
-    // Check if user already exists
-    const { data: existingUser } = await supabase
+    // Check if nickname already exists in our users table
+    const { data: existingProfile, error: profileCheckError } = await supabase
       .from('users')
       .select('id')
       .eq('nickname', nickname)
       .single();
 
-    if (existingUser) {
+    if (profileCheckError && profileCheckError.code !== 'PGRST116') { // PGRST116 means "no rows found"
+      throw profileCheckError;
+    }
+    if (existingProfile) {
       throw new Error('Користувач з таким нікнеймом вже існує');
     }
 
-    const passwordHash = simpleHash(password);
-    
-    const { data, error } = await supabase
+    // Sign up with Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          nickname, // Pass nickname to auth.users metadata
+        },
+      },
+    });
+
+    if (authError) throw authError;
+    if (!authData.user) throw new Error('Supabase Auth user not returned after signup.');
+
+    // Create user profile in our public.users table
+    const { data: profile, error: profileError } = await supabase
       .from('users')
       .insert([
         {
+          id: authData.user.id,
           nickname,
-          password_hash: passwordHash,
-          role: 'user'
-        }
+          email,
+          role: 'user',
+          created_at: new Date().toISOString(),
+        },
       ])
       .select()
       .single();
 
-    if (error) throw error;
-    
-    // Set user context and session
-    await setUserContext(data.id);
-    localStorage.setItem('skoropad_user', JSON.stringify(data));
-    return { user: data, error: null };
+    if (profileError) throw profileError;
+
+    await setUserContext(profile.id);
+    return { user: profile as User, error: null };
   } catch (error: any) {
     return { user: null, error: error.message };
   }
 };
 
-// Login user
-export const loginUser = async (nickname: string, password: string) => {
+// Login user with Supabase Auth
+export const loginUser = async (identifier: string, password: string) => {
   try {
-    const { data: user, error } = await supabase
+    let email = identifier;
+
+    // If identifier is not an email, try to find user by nickname to get email
+    if (!identifier.includes('@')) {
+      const { data: profileData, error: profileError } = await supabase
+        .from('users')
+        .select('email, is_banned')
+        .eq('nickname', identifier)
+        .single();
+
+      if (profileError) throw new Error('Користувача не знайдено');
+      if (profileData.is_banned) throw new Error('Ваш акаунт заблоковано');
+      if (!profileData.email) throw new Error('Email не знайдено для цього користувача');
+      email = profileData.email;
+    }
+
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) throw authError;
+    if (!authData.user) throw new Error('Supabase Auth user not returned after signin.');
+
+    // Fetch full user profile from public.users
+    const { data: profile, error: profileError } = await supabase
       .from('users')
       .select('*')
-      .eq('nickname', nickname)
+      .eq('id', authData.user.id)
       .single();
 
-    if (error) throw new Error('Користувача не знайдено');
-    
-    if (user.is_banned) {
-      throw new Error('Ваш акаунт заблоковано');
-    }
+    if (profileError) throw profileError;
+    if (profile.is_banned) throw new Error('Ваш акаунт заблоковано');
 
-    const isValidPassword = simpleHash(password) === user.password_hash;
-    if (!isValidPassword) {
-      throw new Error('Невірний пароль');
-    }
-
-    // Set user context and session
-    await setUserContext(user.id);
-    localStorage.setItem('skoropad_user', JSON.stringify(user));
-    return { user, error: null };
+    await setUserContext(profile.id);
+    return { user: profile as User, error: null };
   } catch (error: any) {
     return { user: null, error: error.message };
   }
 };
 
 // Logout user
-export const logoutUser = () => {
-  localStorage.removeItem('skoropad_user');
+export const logoutUser = async () => {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    await setUserContext(null); // Clear RLS context
+    return { error: null };
+  } catch (error: any) {
+    return { error: error.message };
+  }
 };
 
-// Get current user
-export const getCurrentUser = (): User | null => {
+// Get current user from Supabase Auth and fetch profile
+export const getCurrentUser = async (): Promise<User | null> => {
   try {
-    const userStr = localStorage.getItem('skoropad_user');
-    return userStr ? JSON.parse(userStr) : null;
-  } catch {
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+    if (authError) throw authError;
+    if (!authUser) return null;
+
+    const { data: profile, error: profileError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', authUser.id)
+      .single();
+
+    if (profileError) throw profileError;
+    return profile as User;
+  } catch (error) {
+    console.error('Error getting current user:', error);
     return null;
   }
 };
@@ -131,10 +170,38 @@ export const hasPermission = (user: User | null, requiredRoles: string[]): boole
 
 // Initialize user context on app start or user change
 export const initializeUserContext = async () => {
-  const user = getCurrentUser();
+  const user = await getCurrentUser();
   if (user) {
     await setUserContext(user.id);
   } else {
     await setUserContext(null); // Clear context if no user
   }
+};
+
+// Admin functions (assuming RLS allows admins to perform these actions)
+export const updateUserRole = async (userId: string, role: User['role']) => {
+  const { data, error } = await supabase.from('users').update({ role }).eq('id', userId).select().single();
+  return { data, error };
+};
+
+export const banUser = async (userId: string, banned: boolean) => {
+  const { data, error } = await supabase.from('users').update({ is_banned: banned }).eq('id', userId).select().single();
+  return { data, error };
+};
+
+export const giveVipStatus = async (userId: string, days = 30) => {
+  const vipExpiresAt = new Date();
+  vipExpiresAt.setDate(vipExpiresAt.getDate() + days);
+
+  const { data, error } = await supabase
+    .from('users')
+    .update({
+      role: 'vip',
+      vip_expires_at: vipExpiresAt.toISOString(),
+    })
+    .eq('id', userId)
+    .select()
+    .single();
+
+  return { data, error };
 };

@@ -9,11 +9,11 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast'; // Corrected import
+import { toast } from 'sonner'; // Corrected import to sonner
 import { useAuth } from '@/contexts/AuthContext';
 import { hasPermission, initializeUserContext } from '@/lib/auth';
 import EditAdModal from '@/components/EditAdModal';
-import ContactButton from '@/components/ContactButton'; // Import ContactButton
+import ContactButton from '@/components/ContactButton';
 
 interface Advertisement {
   id: string;
@@ -67,10 +67,7 @@ const AdvertisementPage = () => {
       if (error) throw error;
       setAdvertisement(data);
     } catch (error: any) {
-      toast({
-        title: 'Помилка завантаження оголошення: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка завантаження оголошення: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -89,16 +86,10 @@ const AdvertisementPage = () => {
 
       if (error) throw error;
 
-      toast({
-        title: 'Оголошення видалено успішно',
-        variant: 'success',
-      });
+      toast.success('Оголошення видалено успішно');
       navigate('/');
     } catch (error: any) {
-      toast({
-        title: 'Помилка видалення: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка видалення: ' + error.message);
     }
   };
 
@@ -162,7 +153,7 @@ const AdvertisementPage = () => {
               </Button>
             </motion.div>
 
-            <Card className={`glass-card ${advertisement.is_vip ? 'border-accent shadow-accent/20' : ''}`}> {/* Changed to glass-card */}
+            <Card className={`glass-card ${advertisement.is_vip ? 'border-accent shadow-accent/20' : ''}`}>
               <CardContent className="p-0">
                 {/* Image Gallery */}
                 {advertisement.images && advertisement.images.length > 0 && (
@@ -231,8 +222,8 @@ const AdvertisementPage = () => {
                               }
                             >
                               {advertisement.users?.role === 'vip' ? 'VIP' : 
-                               ad.users?.role === 'moderator' ? 'Модератор' : 
-                               ad.users?.role === 'admin' ? 'Адмін' : ''}
+                               advertisement.users?.role === 'moderator' ? 'Модератор' : 
+                               advertisement.users?.role === 'admin' ? 'Адмін' : ''}
                             </Badge>
                           )}
                         </div>
@@ -317,10 +308,7 @@ const AdvertisementPage = () => {
                             variant="outline" 
                             onClick={() => {
                               navigator.clipboard.writeText(advertisement.discord_contact!);
-                              toast({
-                                title: 'Discord скопійовано в буфер обміну',
-                                variant: 'success',
-                              });
+                              toast.success('Discord скопійовано в буфер обміну');
                             }}
                             className="rounded-2xl glow-on-hover"
                           >

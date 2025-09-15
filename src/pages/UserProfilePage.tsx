@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast'; // Corrected import
+import { toast } from 'sonner'; // Corrected import to sonner
 import { useAuth } from '@/contexts/AuthContext';
 import { hasPermission } from '@/lib/auth';
 
@@ -70,10 +70,7 @@ const UserProfilePage = () => {
       setAdvertisements(adsData || []);
 
     } catch (error: any) {
-      toast({
-        title: 'Помилка завантаження профілю: ' + error.message,
-        variant: 'destructive',
-      });
+      toast.error('Помилка завантаження профілю: ' + error.message);
       setProfile(null);
       setAdvertisements([]);
     } finally {
@@ -142,7 +139,7 @@ const UserProfilePage = () => {
             </motion.div>
 
             <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.3 }}>
-              <Card className="glass-card mb-8"> {/* Changed to glass-card */}
+              <Card className="glass-card mb-8">
                 <CardContent className="p-8 flex flex-col md:flex-row items-center gap-6">
                   <div className="flex-shrink-0">
                     <UserIcon className="w-24 h-24 text-muted-foreground" />

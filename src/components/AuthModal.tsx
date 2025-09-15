@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, User, Lock } from 'lucide-react';
+import { X, User, Lock, Eye, EyeOff } from 'lucide-react'; // Added Eye and EyeOff
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { registerUser, loginUser } from '@/lib/auth';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast'; // Corrected import
+import { toast } from 'sonner'; // Corrected import to sonner
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -16,7 +16,9 @@ interface AuthModalProps {
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [nickname, setNickname] = useState('');
+  const [email, setEmail] = useState(''); // Added email state for registration
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // Added showPassword state
   const [loading, setLoading] = useState(false);
   const { setUser } = useAuth();
 
@@ -25,30 +27,25 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     setLoading(true);
 
     try {
-      const result = isLogin 
-        ? await loginUser(nickname, password)
-        : await registerUser(nickname, password);
+      let result;
+      if (isLogin) {
+        result = await loginUser(nickname, password); // nickname can be email or nickname
+      } else {
+        result = await registerUser(nickname, email, password); // Pass email for registration
+      }
 
       if (result.error) {
-        toast({
-          title: result.error,
-          variant: 'destructive',
-        });
+        toast.error(result.error);
       } else {
         setUser(result.user);
-        toast({
-          title: isLogin ? 'Успішний вхід!' : 'Реєстрація успішна!',
-          variant: 'success',
-        });
+        toast.success(isLogin ? 'Успішний вхід!' : 'Реєстрація успішна! Перевірте свою пошту для підтвердження.');
         onClose();
         setNickname('');
+        setEmail('');
         setPassword('');
       }
     } catch (error) {
-      toast({
-        title: 'Щось пішло не так',
-        variant: 'destructive',
-      });
+      toast.error('Щось пішло не так');
     } finally {
       setLoading(false);
     }
@@ -63,7 +60,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="glass-card w-full max-w-md mx-4 transform-gpu" // Changed to glass-card
+        className="glass-card w-full max-w-md mx-4 transform-gpu"
       >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">
@@ -83,7 +80,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="nickname">Нікнейм</Label>
+            <Label htmlFor="nickname">{isLogin ? 'Email або нікнейм' : 'Нікнейм'}</Label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
@@ -92,11 +89,29 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 className="pl-10 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
-                placeholder="Введіть нікнейм"
+                placeholder={isLogin ? 'Введіть email або нікнейм' : 'Введіть нікнейм'}
                 required
               />
             </div>
           </div>
+
+          {!isLogin && (
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+                  placeholder="Введіть email"
+                  required
+                />
+              </div>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="password">Пароль</Label>
@@ -104,13 +119,26 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+                className="pl-10 pr-10 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
                 placeholder="Введіть пароль"
                 required
               />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <Eye className="w-4 h-4 text-muted-foreground" />
+                )}
+              </Button>
             </div>
           </div>
 

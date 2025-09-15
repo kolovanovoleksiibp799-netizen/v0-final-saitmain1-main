@@ -2,27 +2,27 @@ import { motion } from 'framer-motion';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Link } from 'react-router-dom'; // Import Link
+import { Link } from 'react-router-dom';
 
 interface ProductCardProps {
   id: string;
-  name: string;
+  title: string; // Changed from name to title
   description: string;
   price: number;
   originalPrice?: number;
-  image: string;
+  imageUrl: string; // Changed from image to imageUrl
   isNew?: boolean;
   isOnSale?: boolean;
   index: number;
 }
 
 const ProductCard = ({
-  id, // Add id to props
-  name,
+  id,
+  title, // Changed from name to title
   description,
   price,
   originalPrice,
-  image,
+  imageUrl, // Changed from image to imageUrl
   isNew,
   isOnSale,
   index
@@ -39,7 +39,7 @@ const ProductCard = ({
       whileHover={{ y: -8, boxShadow: "0 20px 60px -15px hsl(var(--shadow-soft) / 0.4)" }}
       className="group"
     >
-      <Card className="glass-card overflow-hidden relative"> {/* Changed to glass-card */}
+      <Card className="glass-card overflow-hidden relative">
         {/* Badges */}
         <div className="absolute top-4 left-4 z-10 flex flex-col space-y-2">
           {isNew && (
@@ -66,8 +66,8 @@ const ProductCard = ({
         {/* Product Image */}
         <div className="relative overflow-hidden">
           <motion.img
-            src={image}
-            alt={name}
+            src={imageUrl}
+            alt={title}
             className="w-full h-64 object-cover rounded-t-2xl"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.3 }}
@@ -76,7 +76,7 @@ const ProductCard = ({
 
         {/* Product Info */}
         <div className="p-6">
-          <h3 className="font-semibold text-lg mb-2 text-foreground">{name}</h3>
+          <h3 className="font-semibold text-lg mb-2 text-foreground">{title}</h3> {/* Changed from name to title */}
           <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
             {description}
           </p>
@@ -102,7 +102,7 @@ const ProductCard = ({
               size="lg"
             >
               <ShoppingCart className="w-4 h-4 mr-2" />
-              Купити
+              Зв'язатися
             </Button>
             <Link to={`/advertisement/${id}`} className="flex-1">
               <Button 
