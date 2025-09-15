@@ -133,36 +133,6 @@ const Navbar = () => {
     },
   }
 
-  const dropdownVariants = {
-    hidden: {
-      opacity: 0,
-      scale: 0.95,
-      y: -10,
-      rotateX: -15,
-    },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      rotateX: 0,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 25,
-        duration: 0.3,
-      },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.95,
-      y: -10,
-      rotateX: -15,
-      transition: {
-        duration: 0.2,
-      },
-    },
-  }
-
   const mobileMenuVariants = {
     hidden: {
       height: 0,
@@ -214,9 +184,8 @@ const Navbar = () => {
           <Link to="/">
             <motion.div
               className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent cursor-pointer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.2 }}
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
             >
               Skoropad
             </motion.div>
@@ -266,16 +235,12 @@ const Navbar = () => {
                       >
                         <span className="flex items-center gap-1">
                           {menu.title}
-                          <ChevronDown className="relative top-[1px] ml-1 h-3 w-3 transition duration-200 group-data-[state=open]:rotate-180" />
+                          {/* Removed ChevronDown here, as NavigationMenuTrigger adds its own */}
                         </span>
                       </NavigationMenuTrigger>
                       <NavigationMenuContent className="bg-card/90 backdrop-blur-xl border border-border/50 rounded-2xl shadow-soft-lg z-50 overflow-hidden">
-                        <motion.div
+                        <div
                           className="grid w-[400px] gap-3 p-4"
-                          variants={dropdownVariants}
-                          initial="hidden"
-                          animate="visible"
-                          exit="exit"
                         >
                           {menu.items.map((item, itemIndex) => (
                             <NavigationMenuLink key={item.href} asChild>
@@ -293,7 +258,7 @@ const Navbar = () => {
                               </motion.div>
                             </NavigationMenuLink>
                           ))}
-                        </motion.div>
+                        </div>
                       </NavigationMenuContent>
                     </motion.div>
                   </NavigationMenuItem>
