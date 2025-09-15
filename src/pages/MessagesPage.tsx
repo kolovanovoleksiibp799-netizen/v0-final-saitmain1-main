@@ -14,8 +14,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { uk } from 'date-fns/locale';
 import { toast } from 'sonner'; // Corrected import to sonner
-import { useBuggyEffect } from "@/contexts/BuggyEffectContext"; // Import useBuggyEffect
-import GlitchText from "@/components/GlitchText"; // Import GlitchText
 
 const MessagesPage = () => {
   const navigate = useNavigate();
@@ -32,7 +30,6 @@ const MessagesPage = () => {
   } = useMessages();
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   useEffect(() => {
     if (activeConversation) {
@@ -73,8 +70,8 @@ const MessagesPage = () => {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="pt-24 pb-16 text-center">
-          <h1 className="text-2xl font-bold mb-4"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Увійти в акаунт</GlitchText></h1>
-          <p className="text-muted-foreground"><GlitchText intensity={isBuggyMode ? 0.6 : 0}>Для перегляду повідомлень потрібно увійти в акаунт</GlitchText></p>
+          <h1 className="text-2xl font-bold mb-4">Увійти в акаунт</h1>
+          <p className="text-muted-foreground">Для перегляду повідомлень потрібно увійти в акаунт</p>
         </div>
         <Footer />
       </div>
@@ -85,7 +82,7 @@ const MessagesPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <section className={`pt-24 pb-16 ${isBuggyMode ? 'animate-global-glitch' : ''}`}>
+      <section className="pt-24 pb-16">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -97,25 +94,23 @@ const MessagesPage = () => {
               <Button
                 variant="ghost"
                 onClick={() => navigate(-1)}
-                className={`mb-6 glow-on-hover ${isBuggyMode ? 'animate-card-wobble' : ''}`}
+                className="mb-6 glow-on-hover"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Назад</GlitchText>
+                Назад
               </Button>
             </motion.div>
 
             <h1 className="text-3xl font-bold mb-8">
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
-                <GlitchText intensity={isBuggyMode ? 0.9 : 0}>Повідомлення</GlitchText>
-              </span>
+              <span className="bg-gradient-primary bg-clip-text text-transparent">Повідомлення</span>
             </h1>
 
-            <Card className={`glass-card overflow-hidden ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
+            <Card className="glass-card overflow-hidden">
               <CardContent className="p-0 flex h-[calc(100vh-200px)]">
                 {/* Conversations sidebar */}
                 <div className="w-full md:w-1/3 border-r border-border/50 flex flex-col">
                   <div className="p-4 border-b border-border/50">
-                    <h2 className="text-xl font-semibold"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Розмови</GlitchText></h2>
+                    <h2 className="text-xl font-semibold">Розмови</h2>
                   </div>
                   
                   <div className="flex-1 overflow-y-auto">
@@ -135,10 +130,10 @@ const MessagesPage = () => {
                       </div>
                     ) : conversations.length === 0 ? (
                       <div className="p-8 text-center">
-                        <MessageCircle className={`w-12 h-12 text-muted-foreground mx-auto mb-4 ${isBuggyMode ? 'animate-spin-slow' : ''}`} />
-                        <h3 className="text-lg font-medium mb-2"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Поки що немає розмов</GlitchText></h3>
+                        <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-medium mb-2">Поки що немає розмов</h3>
                         <p className="text-muted-foreground">
-                          <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Розмови з'являтимуться після того, як ви почнете спілкування з іншими користувачами</GlitchText>
+                          Розмови з'являтимуться після того, як ви почнете спілкування з іншими користувачами
                         </p>
                       </div>
                     ) : (
@@ -155,7 +150,7 @@ const MessagesPage = () => {
                               whileHover={{ backgroundColor: 'hsl(var(--background-secondary))' }}
                               className={`p-4 cursor-pointer transition-colors ${
                                 activeConversation === conversation.id ? 'bg-background-secondary' : ''
-                              } glow-on-hover ${isBuggyMode ? 'rotate-[0.5deg] scale-[1.01] transition-all duration-100' : ''}`}
+                              } glow-on-hover`}
                               onClick={() => setActiveConversation(conversation.id)}
                             >
                               <div className="flex items-center space-x-3">
@@ -167,20 +162,20 @@ const MessagesPage = () => {
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center justify-between">
                                     <h3 className="font-medium truncate">
-                                      <GlitchText intensity={isBuggyMode ? 0.7 : 0}>{otherUser?.nickname || 'Невідомий користувач'}</GlitchText>
+                                      {otherUser?.nickname || 'Невідомий користувач'}
                                     </h3>
                                     {conversation.last_message && (
-                                      <span className={`text-xs text-muted-foreground ${isBuggyMode ? 'animate-flicker' : ''}`}>
-                                        <GlitchText intensity={isBuggyMode ? 0.5 : 0}>{format(new Date(conversation.last_message.created_at), 'HH:mm', { locale: uk })}</GlitchText>
+                                      <span className="text-xs text-muted-foreground">
+                                        {format(new Date(conversation.last_message.created_at), 'HH:mm', { locale: uk })}
                                       </span>
                                     )}
                                   </div>
                                   <p className="text-sm text-muted-foreground truncate">
-                                    <GlitchText intensity={isBuggyMode ? 0.6 : 0}>{conversation.last_message?.content || 'Почніть розмову'}</GlitchText>
+                                    {conversation.last_message?.content || 'Почніть розмову'}
                                   </p>
                                 </div>
                                 {unreadCount > 0 && (
-                                  <div className={`w-2 h-2 bg-accent rounded-full flex-shrink-0 ${isBuggyMode ? 'animate-pulse' : ''}`}></div>
+                                  <div className="w-2 h-2 bg-accent rounded-full flex-shrink-0"></div>
                                 )}
                               </div>
                             </motion.div>
@@ -204,7 +199,7 @@ const MessagesPage = () => {
                           </Avatar>
                           <div>
                             <h3 className="font-medium">
-                              <GlitchText intensity={isBuggyMode ? 0.8 : 0}>{getOtherUser(conversations.find(c => c.id === activeConversation))?.nickname || 'Невідомий користувач'}</GlitchText>
+                              {getOtherUser(conversations.find(c => c.id === activeConversation))?.nickname || 'Невідомий користувач'}
                             </h3>
                           </div>
                         </div>
@@ -222,12 +217,12 @@ const MessagesPage = () => {
                               message.sender_id === user.id 
                                 ? 'bg-accent text-accent-foreground rounded-t-xl rounded-bl-xl rounded-br-md' 
                                 : 'bg-background-secondary text-foreground rounded-t-xl rounded-br-xl rounded-bl-md'
-                            } ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
-                              <p className="whitespace-pre-wrap"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>{message.content}</GlitchText></p>
+                            }`}>
+                              <p className="whitespace-pre-wrap">{message.content}</p>
                               <p className={`text-xs mt-1 ${
                                 message.sender_id === user.id ? 'text-accent-foreground/70' : 'text-muted-foreground'
-                              } ${isBuggyMode ? 'animate-flicker' : ''}`}>
-                                <GlitchText intensity={isBuggyMode ? 0.5 : 0}>{format(new Date(message.created_at), 'HH:mm', { locale: uk })}</GlitchText>
+                              }`}>
+                                {format(new Date(message.created_at), 'HH:mm', { locale: uk })}
                               </p>
                             </div>
                           </motion.div>
@@ -241,10 +236,10 @@ const MessagesPage = () => {
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             placeholder="Написати повідомлення..."
-                            className={`flex-1 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
+                            className="flex-1 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
                           />
                           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
-                            <Button type="submit" className={`btn-accent rounded-2xl glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}>
+                            <Button type="submit" className="btn-accent rounded-2xl glow-on-hover">
                               <Send className="w-4 h-4" />
                             </Button>
                           </motion.div>
@@ -253,10 +248,10 @@ const MessagesPage = () => {
                     </>
                   ) : (
                     <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                      <MessageCircle className={`w-16 h-16 text-muted-foreground mb-4 ${isBuggyMode ? 'animate-spin-slow' : ''}`} />
-                      <h3 className="text-xl font-medium mb-2"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>Виберіть розмову</GlitchText></h3>
+                      <MessageCircle className="w-16 h-16 text-muted-foreground mb-4" />
+                      <h3 className="text-xl font-medium mb-2">Виберіть розмову</h3>
                       <p className="text-muted-foreground max-w-md">
-                        <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Оберіть розмову зі списку, щоб переглянути повідомлення або почати нову</GlitchText>
+                        Оберіть розмову зі списку, щоб переглянути повідомлення або почати нову
                       </p>
                     </div>
                   )}

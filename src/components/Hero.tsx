@@ -8,13 +8,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { hasPermission } from '@/lib/auth';
-import { useBuggyEffect } from '@/contexts/BuggyEffectContext'; // Import useBuggyEffect
-import GlitchText from './GlitchText'; // Import GlitchText
 
 const Hero = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { user } = useAuth();
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,20 +45,20 @@ const Hero = () => {
   };
 
   return (
-    <section className={`relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-background-secondary to-background ${isBuggyMode ? 'animate-pulse-slow' : ''}`}>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-background-secondary to-background">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div 
           initial={{ x: -200, y: -200, opacity: 0 }}
           animate={{ x: 0, y: 0, opacity: 0.2 }}
           transition={{ duration: 2, ease: "easeOut" }}
-          className={`absolute -top-40 -right-40 w-80 h-80 bg-gradient-primary rounded-full blur-3xl ${isBuggyMode ? 'animate-spin-slow' : ''}`}
+          className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-primary rounded-full blur-3xl"
         ></motion.div>
         <motion.div 
           initial={{ x: 200, y: 200, opacity: 0 }}
           animate={{ x: 0, y: 0, opacity: 0.2 }}
           transition={{ duration: 2, ease: "easeOut", delay: 0.5 }}
-          className={`absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-accent rounded-full blur-3xl ${isBuggyMode ? 'animate-spin-reverse' : ''}`}
+          className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-accent rounded-full blur-3xl"
         ></motion.div>
       </div>
 
@@ -78,9 +75,9 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <GlitchText intensity={isBuggyMode ? 1 : 0}>Ласкаво просимо до{' '}</GlitchText>
+            Ласкаво просимо до{' '}
             <span className="bg-gradient-primary bg-clip-text text-transparent">
-              <GlitchText intensity={isBuggyMode ? 1 : 0}>Skoropad</GlitchText>
+              Skoropad
             </span>
           </motion.h1>
 
@@ -90,7 +87,7 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <GlitchText intensity={isBuggyMode ? 0.7 : 0}>Найкраща платформа для розміщення та пошуку оголошень в Україні</GlitchText>
+            Найкраща платформа для розміщення та пошуку оголошень в Україні
           </motion.p>
 
           {/* Search Bar */}
@@ -101,19 +98,19 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
           >
             <form onSubmit={handleSearch} className="relative">
-              <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5 z-10 ${isBuggyMode ? 'animate-flicker' : ''}`} />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5 z-10" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Пошук оголошень..."
-                className={`pl-12 py-6 text-lg border-0 bg-white/10 dark:bg-background-secondary/50 backdrop-blur-sm rounded-2xl interactive-liquid glow-breathing ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
+                className="pl-12 py-6 text-lg border-0 bg-white/10 dark:bg-background-secondary/50 backdrop-blur-sm rounded-2xl interactive-liquid glow-breathing"
               />
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
                 <Button
                   type="submit"
-                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 btn-accent hover:shadow-glow hover:translate-y-0 ${isBuggyMode ? 'animate-button-flicker' : ''}`}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-accent hover:shadow-glow hover:translate-y-0" // Ensure this is present
                 >
-                  <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Пошук</GlitchText>
+                  Пошук
                 </Button>
               </motion.div>
             </form>
@@ -130,9 +127,9 @@ const Hero = () => {
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
                 <Button 
                   size="lg" 
-                  className={`btn-accent rounded-2xl px-8 py-6 text-lg hover:shadow-glow glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}
+                  className="btn-accent rounded-2xl px-8 py-6 text-lg hover:shadow-glow glow-on-hover"
                 >
-                  <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Створити оголошення</GlitchText>
+                  Створити оголошення
                 </Button>
               </motion.div>
             </Link>
@@ -141,9 +138,9 @@ const Hero = () => {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className={`rounded-2xl px-8 py-6 text-lg border-accent/20 hover:border-accent hover:bg-accent/5 glow-on-hover ${isBuggyMode ? 'animate-card-wobble' : ''}`}
+                  className="rounded-2xl px-8 py-6 text-lg border-accent/20 hover:border-accent hover:bg-accent/5 glow-on-hover"
                 >
-                  <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Переглянути каталог</GlitchText>
+                  Переглянути каталог
                 </Button>
               </motion.div>
             </Link>
@@ -156,44 +153,44 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1 }}
           >
-            <motion.div whileHover={{ y: -5, scale: 1.02 }} transition={{ duration: 0.3 }} className={`text-center ${isBuggyMode ? 'rotate-[1deg] scale-[1.01] transition-all duration-100' : ''}`}>
-              <TrendingUp className={`w-8 h-8 mx-auto mb-2 text-accent ${isBuggyMode ? 'animate-spin-slow' : ''}`} />
-              <div className="text-2xl font-bold"><GlitchText intensity={isBuggyMode ? 0.9 : 0}>1000+</GlitchText></div>
-              <div className="text-sm text-muted-foreground"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Оголошень</GlitchText></div>
+            <motion.div whileHover={{ y: -5, scale: 1.02 }} transition={{ duration: 0.3 }} className="text-center">
+              <TrendingUp className="w-8 h-8 mx-auto mb-2 text-accent" />
+              <div className="text-2xl font-bold">1000+</div>
+              <div className="text-sm text-muted-foreground">Оголошень</div>
             </motion.div>
-            <motion.div whileHover={{ y: -5, scale: 1.02 }} transition={{ duration: 0.3 }} className={`text-center ${isBuggyMode ? 'rotate-[-1deg] scale-[0.99] transition-all duration-100' : ''}`}>
-              <Users className={`w-8 h-8 mx-auto mb-2 text-accent ${isBuggyMode ? 'animate-spin-reverse' : ''}`} />
-              <div className="text-2xl font-bold"><GlitchText intensity={isBuggyMode ? 0.9 : 0}>500+</GlitchText></div>
-              <div className="text-sm text-muted-foreground"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Користувачів</GlitchText></div>
+            <motion.div whileHover={{ y: -5, scale: 1.02 }} transition={{ duration: 0.3 }} className="text-center">
+              <Users className="w-8 h-8 mx-auto mb-2 text-accent" />
+              <div className="text-2xl font-bold">500+</div>
+              <div className="text-sm text-muted-foreground">Користувачів</div>
             </motion.div>
-            <motion.div whileHover={{ y: -5, scale: 1.02 }} transition={{ duration: 0.3 }} className={`text-center ${isBuggyMode ? 'rotate-[0.5deg] scale-[1.005] transition-all duration-100' : ''}`}>
-              <Shield className={`w-8 h-8 mx-auto mb-2 text-accent ${isBuggyMode ? 'animate-flicker' : ''}`} />
-              <div className="text-2xl font-bold"><GlitchText intensity={isBuggyMode ? 0.9 : 0}>100%</GlitchText></div>
-              <div className="text-sm text-muted-foreground"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Безпека</GlitchText></div>
+            <motion.div whileHover={{ y: -5, scale: 1.02 }} transition={{ duration: 0.3 }} className="text-center">
+              <Shield className="w-8 h-8 mx-auto mb-2 text-accent" />
+              <div className="text-2xl font-bold">100%</div>
+              <div className="text-sm text-muted-foreground">Безпека</div>
             </motion.div>
-            <motion.div whileHover={{ y: -5, scale: 1.02 }} transition={{ duration: 0.3 }} className={`text-center ${isBuggyMode ? 'rotate-[-0.5deg] scale-[0.995] transition-all duration-100' : ''}`}>
-              <Star className={`w-8 h-8 mx-auto mb-2 text-accent ${isBuggyMode ? 'animate-spin-fast' : ''}`} />
-              <div className="text-2xl font-bold"><GlitchText intensity={isBuggyMode ? 0.9 : 0}>24/7</GlitchText></div>
-              <div className="text-sm text-muted-foreground"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Підтримка</GlitchText></div>
+            <motion.div whileHover={{ y: -5, scale: 1.02 }} transition={{ duration: 0.3 }} className="text-center">
+              <Star className="w-8 h-8 mx-auto mb-2 text-accent" />
+              <div className="text-2xl font-bold">24/7</div>
+              <div className="text-sm text-muted-foreground">Підтримка</div>
             </motion.div>
           </motion.div>
 
           {/* VIP Banner */}
           <motion.div
-            className={`mt-16 p-6 bg-gradient-accent rounded-3xl border border-accent/20 shadow-soft-lg ${isBuggyMode ? 'animate-card-wobble' : ''}`}
+            className="mt-16 p-6 bg-gradient-accent rounded-3xl border border-accent/20 shadow-soft-lg"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 1.2 }}
             whileHover={{ y: -5, boxShadow: "0 25px 70px -15px hsl(var(--accent) / 0.4)" }}
           >
             <h3 className="text-xl font-bold mb-2 text-accent-foreground">
-              <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Хочете виділити своє оголошення?</GlitchText>
+              Хочете виділити своє оголошення?
             </h3>
             <p className="text-accent-foreground/80 mb-4">
-              <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Отримайте VIP статус та ваші оголошення завжди будуть зверху!</GlitchText>
+              Отримайте VIP статус та ваші оголошення завжди будуть зверху!
             </p>
             <p className="text-sm text-accent-foreground/60">
-              <GlitchText intensity={isBuggyMode ? 0.5 : 0}>Для купівлі VIP статусу напишіть у телеграм: <strong>@TheDuma</strong></GlitchText>
+              Для купівлі VIP статусу напишіть у телеграм: <strong>@TheDuma</strong>
             </p>
           </motion.div>
 
@@ -209,10 +206,10 @@ const Hero = () => {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className={`rounded-2xl px-8 py-6 text-lg border-red-500/20 hover:border-red-500 text-red-600 hover:text-red-500 hover:bg-red-500/5 glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}
+                  className="rounded-2xl px-8 py-6 text-lg border-red-500/20 hover:border-red-500 text-red-600 hover:text-red-500 hover:bg-red-500/5 glow-on-hover"
                 >
                   <Settings className="w-5 h-5 mr-2" />
-                  <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Адмін панель</GlitchText>
+                  Адмін панель
                 </Button>
               </Link>
             </motion.div>

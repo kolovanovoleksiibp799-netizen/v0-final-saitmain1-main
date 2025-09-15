@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { useBuggyEffect } from "@/contexts/BuggyEffectContext" // Import useBuggyEffect
 
 interface GlowOrbProps {
   size?: number
@@ -21,11 +20,9 @@ export const GlowOrb = ({
   duration = 4,
   className = "",
 }: GlowOrbProps) => {
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
-
   return (
     <motion.div
-      className={`absolute rounded-full pointer-events-none ${className} ${isBuggyMode ? 'animate-flicker' : ''}`}
+      className={`absolute rounded-full pointer-events-none ${className}`}
       style={{
         width: size,
         height: size,
@@ -56,11 +53,9 @@ interface PulsingGlowProps {
 }
 
 export const PulsingGlow = ({ children, glowColor = "#10b981", intensity = 0.3, className = "" }: PulsingGlowProps) => {
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
-
   return (
     <motion.div
-      className={`relative ${className} ${isBuggyMode ? 'animate-global-glitch' : ''}`}
+      className={`relative ${className}`}
       animate={{
         boxShadow: [
           `0 0 20px ${glowColor}${Math.floor(intensity * 255)
@@ -94,11 +89,9 @@ interface RippleGlowProps {
 }
 
 export const RippleGlow = ({ trigger = false, color = "#10b981", className = "" }: RippleGlowProps) => {
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
-
   return (
     <motion.div
-      className={`absolute inset-0 rounded-full pointer-events-none ${className} ${isBuggyMode ? 'animate-flicker' : ''}`}
+      className={`absolute inset-0 rounded-full pointer-events-none ${className}`}
       initial={{ scale: 0, opacity: 0.8 }}
       animate={
         trigger
@@ -129,7 +122,6 @@ interface TrailGlowProps {
 
 export const TrailGlow = ({ children, color = "#10b981", trailLength = 20, className = "" }: TrailGlowProps) => {
   const trailRef = useRef<HTMLDivElement>(null)
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   useEffect(() => {
     const element = trailRef.current
@@ -172,17 +164,12 @@ export const TrailGlow = ({ children, color = "#10b981", trailLength = 20, class
       }
     }
 
-    if (!isBuggyMode) {
-      element.addEventListener("mousemove", handleMouseMove)
-    } else {
-      element.removeEventListener("mousemove", handleMouseMove)
-    }
-    
+    element.addEventListener("mousemove", handleMouseMove)
     return () => element.removeEventListener("mousemove", handleMouseMove)
-  }, [color, isBuggyMode])
+  }, [color])
 
   return (
-    <div ref={trailRef} className={`relative overflow-hidden ${className} ${isBuggyMode ? 'animate-global-glitch' : ''}`}>
+    <div ref={trailRef} className={`relative overflow-hidden ${className}`}>
       {children}
     </div>
   )
@@ -197,10 +184,8 @@ export const AuroraGlow = ({
   colors = ["#10b981", "#059669", "#047857", "#065f46"],
   className = "",
 }: AuroraGlowProps) => {
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
-
   return (
-    <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className} ${isBuggyMode ? 'animate-global-glitch' : ''}`}>
+    <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
       {colors.map((color, index) => (
         <motion.div
           key={index}
@@ -235,11 +220,9 @@ interface NeonTextProps {
 }
 
 export const NeonText = ({ children, color = "#10b981", intensity = 1, className = "" }: NeonTextProps) => {
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
-
   return (
     <motion.div
-      className={`relative ${className} ${isBuggyMode ? 'animate-flicker' : ''}`}
+      className={`relative ${className}`}
       style={{
         color: color,
         textShadow: `
@@ -308,11 +291,9 @@ export const ElectricBorder = ({
   speed = 2,
   className = "",
 }: ElectricBorderProps) => {
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
-
   return (
     <motion.div
-      className={`relative ${className} ${isBuggyMode ? 'animate-global-glitch' : ''}`}
+      className={`relative ${className}`}
       style={{
         border: `${thickness}px solid transparent`,
         borderRadius: "inherit",

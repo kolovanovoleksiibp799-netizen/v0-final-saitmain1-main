@@ -6,12 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import { useMessages } from '@/contexts/MessagesContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import { useBuggyEffect } from "@/contexts/BuggyEffectContext"; // Import useBuggyEffect
 
 const MessagesButton = () => {
   const { unreadCount } = useMessages();
   const { user } = useAuth();
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   if (!user) return null;
 
@@ -21,7 +19,7 @@ const MessagesButton = () => {
         <Button
           variant="ghost"
           size="icon"
-          className={`rounded-full relative ${isBuggyMode ? 'animate-spin-slow' : ''}`}
+          className="rounded-full relative"
           asChild
         >
           <Link to="/messages">
@@ -29,7 +27,7 @@ const MessagesButton = () => {
             {unreadCount > 0 && (
               <Badge 
                 variant="destructive" 
-                className={`absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full ${isBuggyMode ? 'animate-flicker' : ''}`}
+                className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full"
               >
                 {unreadCount > 99 ? '99+' : unreadCount}
               </Badge>

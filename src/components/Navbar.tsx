@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, Menu, X, User, LogOut, Plus, Settings, Sun, Moon, Bug } from "lucide-react" // Added Bug icon
+import { Search, Menu, X, User, LogOut, Plus, Settings, Sun, Moon, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/contexts/AuthContext"
@@ -22,8 +22,6 @@ import {
 import { Link } from "react-router-dom"
 import { useTheme } from "next-themes"
 import MessagesButton from "./MessagesButton"
-import { useBuggyEffect } from "@/contexts/BuggyEffectContext" // Import useBuggyEffect
-import GlitchText from "./GlitchText" // Import GlitchText
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -32,7 +30,6 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const { user, setUser } = useAuth()
   const { theme, setTheme } = useTheme()
-  const { isBuggyMode, toggleBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   useEffect(() => {
     const handleScroll = () => {
@@ -175,7 +172,7 @@ const Navbar = () => {
         isScrolled
           ? "bg-background/80 dark:bg-background/60 backdrop-blur-xl shadow-soft-lg border-b border-border/50"
           : "bg-transparent"
-      } ${isBuggyMode ? 'rotate-[0.5deg] scale-[1.01] transition-all duration-100' : ''}`}
+      }`}
       variants={navbarVariants}
       initial="hidden"
       animate="visible"
@@ -191,7 +188,7 @@ const Navbar = () => {
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2 }}
             >
-              <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Skoropad</GlitchText>
+              Skoropad
             </motion.div>
           </Link>
 
@@ -208,7 +205,7 @@ const Navbar = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Пошук оголошень..."
-                className={`pl-10 border-0 bg-background-secondary/70 dark:bg-background-secondary/50 backdrop-blur-sm rounded-2xl interactive-liquid ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
+                className="pl-10 border-0 bg-background-secondary/70 dark:bg-background-secondary/50 backdrop-blur-sm rounded-2xl interactive-liquid"
               />
             </form>
           </motion.div>
@@ -220,7 +217,7 @@ const Navbar = () => {
                 to="/categories"
                 className="text-muted-foreground hover:text-accent transition-colors glow-on-hover"
               >
-                <GlitchText intensity={isBuggyMode ? 0.5 : 0}>Категорії</GlitchText>
+                Категорії
               </Link>
             </motion.div>
 
@@ -229,22 +226,22 @@ const Navbar = () => {
                 {menuItems.map((menu) => (
                   <NavigationMenuItem key={menu.title}>
                     <NavigationMenuTrigger
-                      className={`text-muted-foreground hover:text-foreground bg-transparent hover:bg-background-secondary/50 transition-all duration-300 rounded-lg interactive-liquid glow-on-hover ${isBuggyMode ? 'animate-spin-slow' : ''}`}
+                      className="text-muted-foreground hover:text-foreground bg-transparent hover:bg-background-secondary/50 transition-all duration-300 rounded-lg interactive-liquid glow-on-hover"
                     >
                       <span className="flex items-center gap-1">
-                        <GlitchText intensity={isBuggyMode ? 0.5 : 0}>{menu.title}</GlitchText>
+                        {menu.title}
                       </span>
                     </NavigationMenuTrigger>
-                    <NavigationMenuContent className={`bg-card/90 backdrop-blur-xl border border-border/50 rounded-2xl shadow-soft-lg z-50 overflow-hidden ${isBuggyMode ? 'rotate-[1deg] scale-[1.02] transition-all duration-100' : ''}`}>
+                    <NavigationMenuContent className="bg-card/90 backdrop-blur-xl border border-border/50 rounded-2xl shadow-soft-lg z-50 overflow-hidden">
                       <ul className="grid w-[400px] gap-3 p-4">
-                        {menu.items.map((item) => (
+                        {menu.items.map((item, itemIndex) => (
                           <li key={item.href}>
                             <NavigationMenuLink asChild>
                               <Link
                                 to={item.href}
-                                className={`block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-all duration-300 hover:bg-accent/10 hover:text-accent focus:bg-accent/10 focus:text-accent interactive-liquid glow-on-hover ${isBuggyMode ? 'text-red-500 hover:text-green-500' : ''}`}
+                                className="block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-all duration-300 hover:bg-accent/10 hover:text-accent focus:bg-accent/10 focus:text-accent interactive-liquid glow-on-hover"
                               >
-                                <div className="text-sm font-medium leading-none"><GlitchText intensity={isBuggyMode ? 0.3 : 0}>{item.title}</GlitchText></div>
+                                <div className="text-sm font-medium leading-none">{item.title}</div>
                               </Link>
                             </NavigationMenuLink>
                           </li>
@@ -270,10 +267,10 @@ const Navbar = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => (window.location.href = "/create-ad")}
-                    className={`rounded-2xl interactive-liquid glow-emerald ${isBuggyMode ? 'animate-pulse' : ''}`}
+                    className="rounded-2xl interactive-liquid glow-emerald"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Створити оголошення</GlitchText>
+                    Створити оголошення
                   </Button>
                 </motion.div>
 
@@ -283,10 +280,10 @@ const Navbar = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className={`rounded-2xl interactive-liquid glow-emerald ${isBuggyMode ? 'animate-spin-fast' : ''}`}
+                        className="rounded-2xl interactive-liquid glow-emerald"
                       >
                         <Settings className="w-4 h-4 mr-2" />
-                        <GlitchText intensity={isBuggyMode ? 0.7 : 0}>Адмін панель</GlitchText>
+                        Адмін панель
                       </Button>
                     </motion.div>
                   </Link>
@@ -298,7 +295,7 @@ const Navbar = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.6 }}
                 >
-                  Привіт, <span className="font-medium text-foreground glow-pulse"><GlitchText intensity={isBuggyMode ? 0.8 : 0}>{user.nickname}</GlitchText></span>
+                  Привіт, <span className="font-medium text-foreground glow-pulse">{user.nickname}</span>
                   {user.role !== "user" && (
                     <motion.span
                       className={`ml-1 px-2 py-1 text-xs rounded-full ${
@@ -307,12 +304,12 @@ const Navbar = () => {
                           : user.role === "vip"
                             ? "bg-yellow-500 text-black"
                             : "bg-accent text-accent-foreground"
-                      } ${isBuggyMode ? 'animate-flicker' : ''}`}
+                      }`}
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 0.8, type: "spring", stiffness: 300 }}
                     >
-                      <GlitchText intensity={isBuggyMode ? 0.9 : 0}>{user.role.toUpperCase()}</GlitchText>
+                      {user.role.toUpperCase()}
                     </motion.span>
                   )}
                 </motion.span>
@@ -325,7 +322,7 @@ const Navbar = () => {
                     variant="ghost"
                     size="icon"
                     onClick={handleLogout}
-                    className={`rounded-full interactive-liquid glow-emerald ${isBuggyMode ? 'animate-spin-reverse' : ''}`}
+                    className="rounded-full interactive-liquid glow-emerald"
                   >
                     <LogOut className="w-4 h-4" />
                   </Button>
@@ -342,10 +339,10 @@ const Navbar = () => {
               >
                 <Button
                   onClick={() => setIsAuthModalOpen(true)}
-                  className={`btn-accent rounded-2xl interactive-liquid glow-emerald-intense ${isBuggyMode ? 'animate-pulse-slow' : ''}`}
+                  className="btn-accent rounded-2xl interactive-liquid glow-emerald-intense"
                 >
                   <User className="w-4 h-4 mr-2" />
-                  <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Вхід</GlitchText>
+                  Вхід
                 </Button>
               </motion.div>
             )}
@@ -363,27 +360,11 @@ const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
-                className={`rounded-full interactive-liquid glow-emerald ${isBuggyMode ? 'animate-spin-fast' : ''}`}
+                className="rounded-full interactive-liquid glow-emerald"
               >
                 <motion.div animate={{ rotate: theme === "dark" ? 0 : 180 }} transition={{ duration: 0.5 }}>
                   {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </motion.div>
-              </Button>
-            </motion.div>
-
-            {/* Buggy Mode Toggle */}
-            <motion.div
-              whileHover={{ scale: 1.05, rotate: isBuggyMode ? 360 : 0 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleBuggyMode}
-                className={`rounded-full interactive-liquid ${isBuggyMode ? 'text-red-500 glow-emerald-intense animate-spin-slow' : 'text-muted-foreground'}`}
-              >
-                <Bug className="w-5 h-5" />
               </Button>
             </motion.div>
           </div>
@@ -396,31 +377,16 @@ const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
-                className={`mr-2 rounded-full interactive-liquid glow-emerald ${isBuggyMode ? 'animate-spin-fast' : ''}`}
+                className="mr-2 rounded-full interactive-liquid glow-emerald"
               >
                 {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </Button>
-            </motion.div>
-            {/* Buggy Mode Toggle for Mobile */}
-            <motion.div
-              whileHover={{ scale: 1.05, rotate: isBuggyMode ? 360 : 0 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleBuggyMode}
-                className={`mr-2 rounded-full interactive-liquid ${isBuggyMode ? 'text-red-500 glow-emerald-intense animate-spin-slow' : 'text-muted-foreground'}`}
-              >
-                <Bug className="w-5 h-5" />
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
               <Button
                 variant="ghost"
                 size="icon"
-                className={`interactive-liquid glow-emerald ${isBuggyMode ? 'animate-spin-slow' : ''}`}
+                className="interactive-liquid glow-emerald"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 <motion.div animate={{ rotate: isMenuOpen ? 180 : 0 }} transition={{ duration: 0.3 }}>
@@ -449,16 +415,16 @@ const Navbar = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Пошук оголошень..."
-                    className={`pl-10 border-0 bg-background-secondary/70 dark:bg-background-secondary/50 backdrop-blur-sm rounded-2xl interactive-liquid ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
+                    className="pl-10 border-0 bg-background-secondary/70 dark:bg-background-secondary/50 backdrop-blur-sm rounded-2xl interactive-liquid"
                   />
                 </motion.form>
 
                 {/* Mobile Auth */}
                 {user ? (
                   <motion.div className="space-y-3" variants={mobileItemVariants}>
-                    <div className={`flex items-center justify-between bg-background-secondary rounded-2xl px-4 py-3 interactive-liquid glow-emerald ${isBuggyMode ? 'rotate-[0.5deg] scale-[1.01] transition-all duration-100' : ''}`}>
+                    <div className="flex items-center justify-between bg-background-secondary rounded-2xl px-4 py-3 interactive-liquid glow-emerald">
                       <span className="text-sm">
-                        <GlitchText intensity={isBuggyMode ? 0.8 : 0}>{user.nickname}</GlitchText>
+                        {user.nickname}
                         {user.role !== "user" && (
                           <span
                             className={`ml-2 px-2 py-1 text-xs rounded-full ${
@@ -467,9 +433,9 @@ const Navbar = () => {
                                 : user.role === "vip"
                                   ? "bg-yellow-500 text-black"
                                   : "bg-accent text-accent-foreground"
-                            } ${isBuggyMode ? 'animate-flicker' : ''}`}
+                            }`}
                           >
-                            <GlitchText intensity={isBuggyMode ? 0.9 : 0}>{user.role.toUpperCase()}</GlitchText>
+                            {user.role.toUpperCase()}
                           </span>
                         )}
                       </span>
@@ -492,10 +458,10 @@ const Navbar = () => {
                           setIsMenuOpen(false)
                           window.location.href = "/create-ad"
                         }}
-                        className={`w-full btn-accent rounded-2xl interactive-liquid glow-emerald-intense ${isBuggyMode ? 'animate-pulse-slow' : ''}`}
+                        className="w-full btn-accent rounded-2xl interactive-liquid glow-emerald-intense"
                       >
                         <Plus className="w-4 h-4 mr-2" />
-                        <GlitchText intensity={isBuggyMode ? 0.6 : 0}>Створити оголошення</GlitchText>
+                        Створити оголошення
                       </Button>
                     </motion.div>
 
@@ -508,10 +474,10 @@ const Navbar = () => {
                         >
                           <Button
                             variant="outline"
-                            className={`w-full rounded-2xl interactive-liquid glow-emerald bg-transparent ${isBuggyMode ? 'animate-spin-fast' : ''}`}
+                            className="w-full rounded-2xl interactive-liquid glow-emerald bg-transparent"
                           >
                             <Settings className="w-4 h-4 mr-2" />
-                            <GlitchText intensity={isBuggyMode ? 0.7 : 0}>Адмін панель</GlitchText>
+                            Адмін панель
                           </Button>
                         </motion.div>
                       </Link>
@@ -526,10 +492,10 @@ const Navbar = () => {
                   >
                     <Button
                       onClick={() => setIsAuthModalOpen(true)}
-                      className={`w-full btn-accent rounded-2xl interactive-liquid glow-emerald-intense ${isBuggyMode ? 'animate-pulse-slow' : ''}`}
+                      className="w-full btn-accent rounded-2xl interactive-liquid glow-emerald-intense"
                     >
                       <User className="w-4 h-4 mr-2" />
-                      <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Вхід</GlitchText>
+                      Вхід
                     </Button>
                   </motion.div>
                 )}
@@ -537,10 +503,10 @@ const Navbar = () => {
                 <motion.div variants={mobileItemVariants}>
                   <Link
                     to="/categories"
-                    className={`block rounded-2xl px-4 py-3 bg-background-secondary text-foreground hover:scale-105 transition-transform interactive-liquid glow-on-hover ${isBuggyMode ? 'rotate-[0.5deg] scale-[1.01] transition-all duration-100' : ''}`}
+                    className="block rounded-2xl px-4 py-3 bg-background-secondary text-foreground hover:scale-105 transition-transform interactive-liquid glow-on-hover"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <GlitchText intensity={isBuggyMode ? 0.5 : 0}>Категорії</GlitchText>
+                    Категорії
                   </Link>
                 </motion.div>
 
@@ -554,7 +520,7 @@ const Navbar = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      <div className="font-medium text-foreground px-4 py-2 glow-pulse"><GlitchText intensity={isBuggyMode ? 0.5 : 0}>{menu.title}</GlitchText></div>
+                      <div className="font-medium text-foreground px-4 py-2 glow-pulse">{menu.title}</div>
                       {menu.items.map((item, itemIndex) => (
                         <motion.div
                           key={item.href}
@@ -564,10 +530,10 @@ const Navbar = () => {
                         >
                           <Link
                             to={item.href}
-                            className={`block py-2 px-6 text-muted-foreground hover:text-foreground hover:bg-background-secondary rounded-xl transition-all duration-300 hover:scale-[1.02] transform-gpu interactive-liquid glow-on-hover ${isBuggyMode ? 'text-red-500 hover:text-green-500' : ''}`}
+                            className="block py-2 px-6 text-muted-foreground hover:text-foreground hover:bg-background-secondary rounded-xl transition-all duration-300 hover:scale-[1.02] transform-gpu interactive-liquid glow-on-hover"
                             onClick={() => setIsMenuOpen(false)}
                           >
-                            <GlitchText intensity={isBuggyMode ? 0.3 : 0}>{item.title}</GlitchText>
+                            {item.title}
                           </Link>
                         </motion.div>
                       ))}

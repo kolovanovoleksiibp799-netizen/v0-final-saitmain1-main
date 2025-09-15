@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useCallback } from "react"
-import { useBuggyEffect } from "@/contexts/BuggyEffectContext" // Import useBuggyEffect
 
 interface Particle {
   id: number
@@ -45,7 +44,6 @@ const ParticleSystem = ({
   const particlesRef = useRef<Particle[]>([])
   const mouseRef = useRef({ x: 0, y: 0, isMoving: false })
   const timeRef = useRef(0)
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   const createParticle = useCallback(
     (id: number, canvas: HTMLCanvasElement): Particle => {
@@ -78,13 +76,6 @@ const ParticleSystem = ({
     const currentOpacity = particle.opacity * pulseIntensity
 
     ctx.globalAlpha = currentOpacity
-
-    // Apply buggy mode effects
-    if (isBuggyMode) {
-      ctx.filter = `hue-rotate(${Math.random() * 360}deg) saturate(200%) blur(1px)`;
-      ctx.globalAlpha = Math.random() * 0.5 + 0.5; // Flickering opacity
-    }
-
     ctx.translate(particle.x, particle.y)
     ctx.rotate(particle.rotation)
 
@@ -175,7 +166,7 @@ const ParticleSystem = ({
     }
 
     ctx.restore()
-  }, [isBuggyMode])
+  }, [])
 
   const drawConnections = useCallback((ctx: CanvasRenderingContext2D, particles: Particle[]) => {
     const maxDistance = 120
@@ -313,12 +304,7 @@ const ParticleSystem = ({
       animationRef.current = requestAnimationFrame(animate)
     }
 
-    if (!isBuggyMode) {
-      animate()
-    } else {
-      cancelAnimationFrame(animationRef.current!); // Stop animation in buggy mode
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-    }
+    animate()
 
     return () => {
       window.removeEventListener("resize", resizeCanvas)
@@ -338,7 +324,6 @@ const ParticleSystem = ({
     createParticle,
     drawParticle,
     drawConnections,
-    isBuggyMode
   ])
 
   return (

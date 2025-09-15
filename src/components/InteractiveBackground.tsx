@@ -5,7 +5,6 @@ import LiquidGrassBackground from "./LiquidGrassBackground"
 import FloatingParticles from "./FloatingParticles"
 import ParticleSystem from "./ParticleSystem"
 import { AuroraGlow } from "./GlowEffects"
-import { useBuggyEffect } from "@/contexts/BuggyEffectContext" // Import useBuggyEffect
 
 interface InteractiveBackgroundProps {
   className?: string
@@ -27,7 +26,6 @@ const InteractiveBackground = ({
   customColors,
 }: InteractiveBackgroundProps) => {
   const [isVisible, setIsVisible] = useState(false)
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   useEffect(() => {
     // Delay rendering to avoid hydration issues
@@ -51,10 +49,10 @@ const InteractiveBackground = ({
 
   const colors = getThemeColors()
 
-  if (!isVisible) return null;
+  if (!isVisible) return null
 
   return (
-    <div className={`fixed inset-0 overflow-hidden pointer-events-none ${className} ${isBuggyMode ? 'animate-global-glitch' : ''}`}>
+    <div className={`fixed inset-0 overflow-hidden pointer-events-none ${className}`}>
       {/* Aurora background layer */}
       {enableAurora && (
         <div className="absolute inset-0 z-0">

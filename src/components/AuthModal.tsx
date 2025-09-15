@@ -7,8 +7,6 @@ import { Label } from '@/components/ui/label';
 import { registerUser, loginUser } from '@/lib/auth';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner'; // Corrected import to sonner
-import { useBuggyEffect } from "@/contexts/BuggyEffectContext"; // Import useBuggyEffect
-import GlitchText from "./GlitchText"; // Import GlitchText
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -23,7 +21,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [showPassword, setShowPassword] = useState(false); // Added showPassword state
   const [loading, setLoading] = useState(false);
   const { setUser } = useAuth();
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,18 +60,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className={`glass-card w-full max-w-md mx-4 transform-gpu ${isBuggyMode ? 'animate-card-wobble' : ''}`}
+        className="glass-card w-full max-w-md mx-4 transform-gpu"
       >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">
-            <GlitchText intensity={isBuggyMode ? 0.9 : 0}>{isLogin ? 'Вхід' : 'Реєстрація'}</GlitchText>
+            {isLogin ? 'Вхід' : 'Реєстрація'}
           </h2>
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} transition={{ duration: 0.2 }}>
             <Button
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className={`rounded-full hover:bg-destructive/10 hover:text-destructive transition-all duration-300 glow-on-hover ${isBuggyMode ? 'animate-spin-slow' : ''}`}
+              className="rounded-full hover:bg-destructive/10 hover:text-destructive transition-all duration-300 glow-on-hover"
             >
               <X className="w-5 h-5" />
             </Button>
@@ -83,15 +80,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="nickname"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>{isLogin ? 'Email або нікнейм' : 'Нікнейм'}</GlitchText></Label>
+            <Label htmlFor="nickname">{isLogin ? 'Email або нікнейм' : 'Нікнейм'}</Label>
             <div className="relative">
-              <User className={`absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 ${isBuggyMode ? 'animate-flicker' : ''}`} />
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
                 id="nickname"
                 type="text"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
-                className={`pl-10 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
+                className="pl-10 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
                 placeholder={isLogin ? 'Введіть email або нікнейм' : 'Введіть нікнейм'}
                 required
               />
@@ -100,15 +97,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
           {!isLogin && (
             <div className="space-y-2">
-              <Label htmlFor="email"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Email</GlitchText></Label>
+              <Label htmlFor="email">Email</Label>
               <div className="relative">
-                <User className={`absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 ${isBuggyMode ? 'animate-flicker' : ''}`} />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`pl-10 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
+                  className="pl-10 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
                   placeholder="Введіть email"
                   required
                 />
@@ -117,15 +114,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="password"><GlitchText intensity={isBuggyMode ? 0.7 : 0}>Пароль</GlitchText></Label>
+            <Label htmlFor="password">Пароль</Label>
             <div className="relative">
-              <Lock className={`absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 ${isBuggyMode ? 'animate-flicker' : ''}`} />
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`pl-10 pr-10 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
+                className="pl-10 pr-10 rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
                 placeholder="Введіть пароль"
                 required
               />
@@ -133,7 +130,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className={`absolute right-0 top-0 h-full px-3 hover:bg-transparent ${isBuggyMode ? 'animate-button-flicker' : ''}`}
+                className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -148,25 +145,25 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.2 }}>
             <Button
               type="submit"
-              className={`w-full btn-accent rounded-2xl transform-gpu transition-all duration-300 hover:shadow-glow glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}
+              className="w-full btn-accent rounded-2xl transform-gpu transition-all duration-300 hover:shadow-glow glow-on-hover"
               disabled={loading}
             >
-              {loading ? <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Завантаження...</GlitchText> : <GlitchText intensity={isBuggyMode ? 0.8 : 0}>{isLogin ? 'Увійти' : 'Зареєструватися'}</GlitchText>}
+              {loading ? 'Завантаження...' : (isLogin ? 'Увійти' : 'Зареєструватися')}
             </Button>
           </motion.div>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-muted-foreground">
-            <GlitchText intensity={isBuggyMode ? 0.6 : 0}>{isLogin ? 'Немає акаунту?' : 'Вже є акаунт?'}</GlitchText>
+            {isLogin ? 'Немає акаунту?' : 'Вже є акаунт?'}
           </p>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
             <Button
               variant="link"
               onClick={() => setIsLogin(!isLogin)}
-              className={`text-accent hover:text-accent-light transition-all duration-300 glow-on-hover ${isBuggyMode ? 'animate-flicker' : ''}`}
+              className="text-accent hover:text-accent-light transition-all duration-300 glow-on-hover"
             >
-              <GlitchText intensity={isBuggyMode ? 0.7 : 0}>{isLogin ? 'Зареєструватися' : 'Увійти'}</GlitchText>
+              {isLogin ? 'Зареєструватися' : 'Увійти'}
             </Button>
           </motion.div>
         </div>

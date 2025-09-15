@@ -7,8 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useMessages } from '@/contexts/MessagesContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner'; // Corrected import to sonner
-import { useBuggyEffect } from "@/contexts/BuggyEffectContext"; // Import useBuggyEffect
-import GlitchText from "./GlitchText"; // Import GlitchText
 
 interface ContactButtonProps {
   userId: string;
@@ -21,7 +19,6 @@ const ContactButton: React.FC<ContactButtonProps> = ({ userId, userName, adverti
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
-  const { isBuggyMode } = useBuggyEffect(); // Use buggy effect context
 
   const handleSendMessage = async () => {
     if (!user) {
@@ -48,11 +45,11 @@ const ContactButton: React.FC<ContactButtonProps> = ({ userId, userName, adverti
     return (
       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
         <Button 
-          className={`btn-accent rounded-2xl glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}
+          className="btn-accent rounded-2xl glow-on-hover"
           onClick={() => toast.info('Увійдіть в акаунт для відправки повідомлень')}
         >
           <MessageCircle className="w-4 h-4 mr-2" />
-          <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Написати</GlitchText>
+          Написати
         </Button>
       </motion.div>
     );
@@ -62,27 +59,27 @@ const ContactButton: React.FC<ContactButtonProps> = ({ userId, userName, adverti
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
-          <Button className={`btn-accent rounded-2xl glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}>
+          <Button className="btn-accent rounded-2xl glow-on-hover">
             <MessageCircle className="w-4 h-4 mr-2" />
-            <GlitchText intensity={isBuggyMode ? 0.8 : 0}>Написати {userName}</GlitchText>
+            Написати {userName}
           </Button>
         </motion.div>
       </DialogTrigger>
-      <DialogContent className={`sm:max-w-[425px] glass-card ${isBuggyMode ? 'animate-card-wobble' : ''}`}>
+      <DialogContent className="sm:max-w-[425px] glass-card">
         <DialogHeader>
-          <DialogTitle><GlitchText intensity={isBuggyMode ? 0.9 : 0}>Написати {userName}</GlitchText></DialogTitle>
+          <DialogTitle>Написати {userName}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <Textarea
             placeholder="Ваше повідомлення..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className={`min-h-[120px] rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background ${isBuggyMode ? 'animate-pulse border-red-500' : ''}`}
+            className="min-h-[120px] rounded-2xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
           />
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
             <Button 
               onClick={handleSendMessage} 
-              className={`w-full btn-accent rounded-2xl glow-on-hover ${isBuggyMode ? 'animate-button-flicker' : ''}`}
+              className="w-full btn-accent rounded-2xl glow-on-hover"
               disabled={!message.trim()}
             >
               <Send className="w-4 h-4" />

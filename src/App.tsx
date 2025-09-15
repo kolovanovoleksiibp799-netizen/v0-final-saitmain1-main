@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/ui/theme-provider"; // Use shadcn/ui ThemeProvider
 import { MessagesProvider } from "@/contexts/MessagesContext";
-import { BuggyEffectProvider } from "@/contexts/BuggyEffectContext"; // Import BuggyEffectProvider
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 // Dynamically import pages using React.lazy for code splitting
@@ -30,28 +29,26 @@ const App = () => (
     <ThemeProvider defaultTheme="system" attribute="class">
       <AuthProvider>
         <MessagesProvider>
-          <BuggyEffectProvider> {/* Wrap the entire app with BuggyEffectProvider */}
-            <TooltipProvider>
-              <Sonner /> {/* Use Sonner here */}
-              <BrowserRouter>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/categories" element={<CategoriesPage />} />
-                    <Route path="/:category/:subcategory" element={<SubcategoryPage />} />
-                    <Route path="/admin" element={<AdminPanel />} />
-                    <Route path="/create-ad" element={<CreateAdPage />} />
-                    <Route path="/advertisement/:id" element={<AdvertisementPage />} />
-                    <Route path="/profile/:userId" element={<UserProfilePage />} />
-                    <Route path="/messages" element={<MessagesPage />} />
-                    <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-                    <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Suspense>
-              </BrowserRouter>
-            </TooltipProvider>
-          </BuggyEffectProvider>
+          <TooltipProvider>
+            <Sonner /> {/* Use Sonner here */}
+            <BrowserRouter>
+              <Suspense fallback={<LoadingSpinner />}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/categories" element={<CategoriesPage />} />
+                  <Route path="/:category/:subcategory" element={<SubcategoryPage />} />
+                  <Route path="/admin" element={<AdminPanel />} />
+                  <Route path="/create-ad" element={<CreateAdPage />} />
+                  <Route path="/advertisement/:id" element={<AdvertisementPage />} />
+                  <Route path="/profile/:userId" element={<UserProfilePage />} />
+                  <Route path="/messages" element={<MessagesPage />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                  <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </TooltipProvider>
         </MessagesProvider>
       </AuthProvider>
     </ThemeProvider>
