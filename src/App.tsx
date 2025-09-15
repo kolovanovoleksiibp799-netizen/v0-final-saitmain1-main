@@ -9,7 +9,8 @@ import { MessagesProvider } from "@/contexts/MessagesContext";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 // Dynamically import pages using React.lazy for code splitting
-const Index = React.lazy(() => import("./pages/Index"));
+// const Index = React.lazy(() => import("./pages/Index")); // Temporarily disable lazy loading for Index
+import Index from "./pages/Index"; // Import Index directly for debugging
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const SubcategoryPage = React.lazy(() => import("./pages/SubcategoryPage"));
 const CategoriesPage = React.lazy(() => import("./pages/CategoriesPage"));
