@@ -82,8 +82,7 @@ const ContactButton: React.FC<ContactButtonProps> = ({ userId, userName, adverti
               className="w-full btn-accent rounded-2xl glow-on-hover"
               disabled={!message.trim()}
             >
-              <Send className="w-4 h-4 mr-2" />
-              Надіслати
+              <Send className="w-4 h-4" />
             </Button>
           </motion.div>
         </div>
