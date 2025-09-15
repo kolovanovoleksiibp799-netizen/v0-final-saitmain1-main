@@ -192,36 +192,31 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-6">
             <NavigationMenu>
               <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger
-                    className="text-muted-foreground hover:text-foreground bg-transparent hover:bg-background-secondary/50 transition-all duration-300 rounded-lg interactive-liquid glow-on-hover"
-                  >
-                    Категорії
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent className="bg-card/90 backdrop-blur-xl border border-border/50 rounded-2xl shadow-soft-lg z-50 overflow-hidden">
-                    <ul className="grid w-[600px] gap-3 p-4 md:w-[800px] md:grid-cols-4">
-                      {categoriesData.map((group) => (
-                        <li key={group.title} className="row-span-3">
-                          <p className="text-lg font-semibold mb-2 text-foreground">{group.title}</p>
-                          <ul className="space-y-1">
-                            {group.items.map((item) => (
-                              <li key={item.href}>
-                                <NavigationMenuLink asChild>
-                                  <Link
-                                    to={item.href}
-                                    className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent focus:bg-accent/10 focus:text-accent text-muted-foreground"
-                                  >
-                                    <div className="text-sm leading-none">{item.title}</div>
-                                  </Link>
-                                </NavigationMenuLink>
-                              </li>
-                            ))}
-                          </ul>
-                        </li>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
+                {categoriesData.map((group) => (
+                  <NavigationMenuItem key={group.title}>
+                    <NavigationMenuTrigger
+                      className="text-muted-foreground hover:text-foreground bg-transparent hover:bg-background-secondary/50 transition-all duration-300 rounded-lg interactive-liquid glow-on-hover"
+                    >
+                      {group.title}
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent className="bg-card/90 backdrop-blur-xl border border-border/50 rounded-2xl shadow-soft-lg z-50 overflow-hidden">
+                      <ul className="grid w-[200px] gap-3 p-4"> {/* Adjusted width for single column */}
+                        {group.items.map((item) => (
+                          <li key={item.href}>
+                            <NavigationMenuLink asChild>
+                              <Link
+                                to={item.href}
+                                className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent focus:bg-accent/10 focus:text-accent text-muted-foreground"
+                              >
+                                <div className="text-sm leading-none">{item.title}</div>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                        ))}
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                ))}
               </NavigationMenuList>
             </NavigationMenu>
 
