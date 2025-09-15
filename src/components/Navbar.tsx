@@ -183,9 +183,10 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           <Link to="/">
             <motion.div
-              className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent cursor-pointer"
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
+              className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent cursor-pointer glow-text" // Added glow-text
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2 }}
             >
               Skoropad
             </motion.div>
@@ -235,7 +236,6 @@ const Navbar = () => {
                       >
                         <span className="flex items-center gap-1">
                           {menu.title}
-                          {/* Removed ChevronDown here, as NavigationMenuTrigger adds its own */}
                         </span>
                       </NavigationMenuTrigger>
                       <NavigationMenuContent className="bg-card/90 backdrop-blur-xl border border-border/50 rounded-2xl shadow-soft-lg z-50 overflow-hidden">

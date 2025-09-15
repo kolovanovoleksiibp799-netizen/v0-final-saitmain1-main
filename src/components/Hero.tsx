@@ -108,7 +108,7 @@ const Hero = () => {
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
                 <Button
                   type="submit"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-accent hover:shadow-glow"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-accent hover:shadow-glow hover:translate-y-0" // Added hover:translate-y-0
                 >
                   Пошук
                 </Button>
