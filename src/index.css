@@ -439,8 +439,14 @@
   }
 
   /* Custom CSS to hide the NavigationMenuIndicator */
-  .no-indicator [data-radix-navigation-menu-indicator] {
+  [data-radix-navigation-menu-indicator] {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    border: none !important;
+    background: none !important;
+    pointer-events: none !important;
   }
 }
 
