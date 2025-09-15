@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/contexts/AuthContext"
 import { logoutUser, hasPermission } from "@/lib/auth"
 import AuthModal from "./AuthModal"
-import { toast } from "sonner" // Corrected import to sonner
+import { toast } from "sonner"
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -28,7 +28,6 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const { user, setUser } = useAuth()
   const { theme, setTheme } = useTheme()
 
@@ -110,19 +109,6 @@ const Navbar = () => {
         duration: 0.8,
       },
     },
-  }
-
-  const logoVariants = {
-    initial: { scale: 1 },
-    hover: {
-      scale: 1.1,
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 10,
-      },
-    },
-    tap: { scale: 0.95 },
   }
 
   const menuItemVariants = {
@@ -227,11 +213,10 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           <Link to="/">
             <motion.div
-              className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent cursor-pointer liquid-morph glow-emerald"
-              variants={logoVariants}
-              initial="initial"
-              whileHover="hover"
-              whileTap="tap"
+              className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent cursor-pointer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2 }}
             >
               Skoropad
             </motion.div>
@@ -250,7 +235,7 @@ const Navbar = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Пошук оголошень..."
-                className="pl-10 border-0 bg-background-secondary/70 dark:bg-background-secondary/50 backdrop-blur-sm rounded-2xl interactive-liquid glow-breathing"
+                className="pl-10 border-0 bg-background-secondary/70 dark:bg-background-secondary/50 backdrop-blur-sm rounded-2xl interactive-liquid"
               />
             </form>
           </motion.div>
@@ -278,47 +263,38 @@ const Navbar = () => {
                     >
                       <NavigationMenuTrigger
                         className="text-muted-foreground hover:text-foreground bg-transparent hover:bg-background-secondary/50 transition-all duration-300 rounded-lg interactive-liquid glow-on-hover"
-                        onMouseEnter={() => setActiveDropdown(menu.title)}
-                        onMouseLeave={() => setActiveDropdown(null)}
                       >
                         <span className="flex items-center gap-1">
                           {menu.title}
-                          <motion.div
-                            animate={{ rotate: activeDropdown === menu.title ? 180 : 0 }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            <ChevronDown className="w-4 h-4" />
-                          </motion.div>
+                          <ChevronDown className="relative top-[1px] ml-1 h-3 w-3 transition duration-200 group-data-[state=open]:rotate-180" />
                         </span>
                       </NavigationMenuTrigger>
-                      <AnimatePresence>
-                        <NavigationMenuContent className="bg-card/90 backdrop-blur-xl border border-border/50 rounded-2xl shadow-soft-lg z-50 overflow-hidden">
-                          <motion.div
-                            className="grid w-[400px] gap-3 p-4"
-                            variants={dropdownVariants}
-                            initial="hidden"
-                            animate="visible"
-                            exit="exit"
-                          >
-                            {menu.items.map((item, itemIndex) => (
-                              <NavigationMenuLink key={item.href} asChild>
-                                <motion.div
-                                  initial={{ opacity: 0, x: -20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: itemIndex * 0.05 }}
+                      <NavigationMenuContent className="bg-card/90 backdrop-blur-xl border border-border/50 rounded-2xl shadow-soft-lg z-50 overflow-hidden">
+                        <motion.div
+                          className="grid w-[400px] gap-3 p-4"
+                          variants={dropdownVariants}
+                          initial="hidden"
+                          animate="visible"
+                          exit="exit"
+                        >
+                          {menu.items.map((item, itemIndex) => (
+                            <NavigationMenuLink key={item.href} asChild>
+                              <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: itemIndex * 0.05 }}
+                              >
+                                <Link
+                                  to={item.href}
+                                  className="block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-all duration-300 hover:bg-accent/10 hover:text-accent focus:bg-accent/10 focus:text-accent interactive-liquid glow-on-hover"
                                 >
-                                  <Link
-                                    to={item.href}
-                                    className="block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-all duration-300 hover:bg-accent/10 hover:text-accent focus:bg-accent/10 focus:text-accent interactive-liquid glow-on-hover"
-                                  >
-                                    <div className="text-sm font-medium leading-none">{item.title}</div>
-                                  </Link>
-                                </motion.div>
-                              </NavigationMenuLink>
-                            ))}
-                          </motion.div>
-                        </NavigationMenuContent>
-                      </AnimatePresence>
+                                  <div className="text-sm font-medium leading-none">{item.title}</div>
+                                </Link>
+                              </motion.div>
+                            </NavigationMenuLink>
+                          ))}
+                        </motion.div>
+                      </NavigationMenuContent>
                     </motion.div>
                   </NavigationMenuItem>
                 ))}
@@ -339,7 +315,7 @@ const Navbar = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => (window.location.href = "/create-ad")}
-                    className="rounded-2xl interactive-liquid glow-emerald float-gentle"
+                    className="rounded-2xl interactive-liquid glow-emerald"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Створити оголошення
@@ -352,7 +328,7 @@ const Navbar = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="rounded-2xl interactive-liquid glow-emerald float-gentle"
+                        className="rounded-2xl interactive-liquid glow-emerald"
                       >
                         <Settings className="w-4 h-4 mr-2" />
                         Адмін панель
@@ -370,12 +346,12 @@ const Navbar = () => {
                   Привіт, <span className="font-medium text-foreground glow-pulse">{user.nickname}</span>
                   {user.role !== "user" && (
                     <motion.span
-                      className={`ml-1 px-2 py-1 text-xs rounded-full liquid-morph ${
+                      className={`ml-1 px-2 py-1 text-xs rounded-full ${
                         user.role === "admin"
-                          ? "bg-red-600 text-white glow-emerald"
+                          ? "bg-red-600 text-white"
                           : user.role === "vip"
-                            ? "bg-yellow-500 text-black glow-emerald"
-                            : "bg-accent text-accent-foreground glow-emerald"
+                            ? "bg-yellow-500 text-black"
+                            : "bg-accent text-accent-foreground"
                       }`}
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -411,7 +387,7 @@ const Navbar = () => {
               >
                 <Button
                   onClick={() => setIsAuthModalOpen(true)}
-                  className="btn-accent rounded-2xl interactive-liquid glow-emerald-intense float-gentle"
+                  className="btn-accent rounded-2xl interactive-liquid glow-emerald-intense"
                 >
                   <User className="w-4 h-4 mr-2" />
                   Вхід
@@ -432,7 +408,7 @@ const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
-                className="rounded-full interactive-liquid glow-emerald float-dynamic"
+                className="rounded-full interactive-liquid glow-emerald"
               >
                 <motion.div animate={{ rotate: theme === "dark" ? 0 : 180 }} transition={{ duration: 0.5 }}>
                   {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -442,14 +418,14 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex items-center">
+          <div className="flex items-center lg:hidden">
             {/* Theme Toggle for Mobile */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
-                className="lg:hidden mr-2 rounded-full interactive-liquid glow-emerald"
+                className="mr-2 rounded-full interactive-liquid glow-emerald"
               >
                 {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </Button>
@@ -458,7 +434,7 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden interactive-liquid glow-emerald"
+                className="interactive-liquid glow-emerald"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 <motion.div animate={{ rotate: isMenuOpen ? 180 : 0 }} transition={{ duration: 0.3 }}>
@@ -499,7 +475,7 @@ const Navbar = () => {
                         {user.nickname}
                         {user.role !== "user" && (
                           <span
-                            className={`ml-2 px-2 py-1 text-xs rounded-full liquid-morph ${
+                            className={`ml-2 px-2 py-1 text-xs rounded-full ${
                               user.role === "admin"
                                 ? "bg-red-600 text-white"
                                 : user.role === "vip"
@@ -521,6 +497,8 @@ const Navbar = () => {
                         </Button>
                       </motion.div>
                     </div>
+
+                    <MessagesButton />
 
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
                       <Button
