@@ -134,8 +134,9 @@ const EditAdModal: FC<EditAdModalProps> = ({ isOpen, onClose, advertisement, onS
 
       setImages([...images, publicUrl]);
       toast.success('Зображення завантажено успішно!');
-    } catch (error: any) {
-      toast.error('Помилка завантаження: ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'невідома помилка';
+      toast.error('Помилка завантаження: ' + errorMessage);
     } finally {
       const newUploadingImages = [...uploadingImages];
       newUploadingImages.pop();
@@ -205,8 +206,9 @@ const EditAdModal: FC<EditAdModalProps> = ({ isOpen, onClose, advertisement, onS
       toast.success('Оголошення оновлено успішно!');
       onSuccess();
       onClose();
-    } catch (error: any) {
-      toast.error('Помилка при оновленні оголошення: ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'невідома помилка';
+      toast.error('Помилка при оновленні оголошення: ' + errorMessage);
     } finally {
       setLoading(false);
     }

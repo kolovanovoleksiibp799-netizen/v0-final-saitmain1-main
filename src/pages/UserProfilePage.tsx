@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Crown, User as UserIcon } from 'lucide-react';
@@ -39,11 +39,7 @@ const UserProfilePage = () => {
   const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchUserProfileAndAds();
-  }, [userId]);
-
-  const fetchUserProfileAndAds = async () => {
+  const fetchUserProfileAndAds = useCallback(async () => {
     try {
       setLoading(true);
       // Fetch user profile
@@ -66,14 +62,19 @@ const UserProfilePage = () => {
       if (adsError) throw adsError;
       setAdvertisements(adsData || []);
 
-    } catch (error: any) {
-      toast.error('Помилка завантаження профілю: ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'невідома помилка';
+      toast.error('Помилка завантаження профілю: ' + errorMessage);
       setProfile(null);
       setAdvertisements([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchUserProfileAndAds();
+  }, [fetchUserProfileAndAds]);
 
   if (loading) {
     return (

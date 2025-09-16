@@ -39,10 +39,11 @@ const Hero = () => {
       
       // В реальній реалізації тут би був перехід на сторінку результатів пошуку
       console.log('Search results:', data);
-    } catch (error: any) {
-      toast.error('Помилка пошуку: ' + error.message);
-    }
-  };
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'невідома помилка';
+        toast.error('Помилка пошуку: ' + errorMessage);
+      }
+    };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-background-secondary to-background">

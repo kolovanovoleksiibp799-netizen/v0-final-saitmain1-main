@@ -118,51 +118,54 @@ const ParticleSystem = ({
         ctx.fill()
         break
 
-      case "star":
-        ctx.shadowColor = particle.color
-        ctx.shadowBlur = particle.size * 2
-        ctx.beginPath()
-        const spikes = 5
-        const outerRadius = particle.size
-        const innerRadius = particle.size * 0.4
+    case "star": {
+      ctx.shadowColor = particle.color
+      ctx.shadowBlur = particle.size * 2
+      ctx.beginPath()
+      const spikes = 5
+      const outerRadius = particle.size
+      const innerRadius = particle.size * 0.4
 
-        for (let i = 0; i < spikes * 2; i++) {
-          const radius = i % 2 === 0 ? outerRadius : innerRadius
-          const angle = (i * Math.PI) / spikes
-          const x = Math.cos(angle) * radius
-          const y = Math.sin(angle) * radius
-          if (i === 0) ctx.moveTo(x, y)
-          else ctx.lineTo(x, y)
-        }
-        ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-        break
+      for (let i = 0; i < spikes * 2; i++) {
+        const radius = i % 2 === 0 ? outerRadius : innerRadius
+        const angle = (i * Math.PI) / spikes
+        const x = Math.cos(angle) * radius
+        const y = Math.sin(angle) * radius
+        if (i === 0) ctx.moveTo(x, y)
+        else ctx.lineTo(x, y)
+      }
+      ctx.closePath()
+      ctx.fill()
+      ctx.stroke()
+      break
+    }
 
-      case "diamond":
-        ctx.shadowColor = particle.color
-        ctx.shadowBlur = particle.size * 2
-        ctx.beginPath()
-        ctx.moveTo(0, -particle.size)
-        ctx.lineTo(particle.size, 0)
-        ctx.lineTo(0, particle.size)
-        ctx.lineTo(-particle.size, 0)
-        ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-        break
+    case "diamond": {
+      ctx.shadowColor = particle.color
+      ctx.shadowBlur = particle.size * 2
+      ctx.beginPath()
+      ctx.moveTo(0, -particle.size)
+      ctx.lineTo(particle.size, 0)
+      ctx.lineTo(0, particle.size)
+      ctx.lineTo(-particle.size, 0)
+      ctx.closePath()
+      ctx.fill()
+      ctx.stroke()
+      break
+    }
 
-      case "triangle":
-        ctx.shadowColor = particle.color
-        ctx.shadowBlur = particle.size * 2
-        ctx.beginPath()
-        ctx.moveTo(0, -particle.size)
-        ctx.lineTo(particle.size * 0.866, particle.size * 0.5)
-        ctx.lineTo(-particle.size * 0.866, particle.size * 0.5)
-        ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-        break
+    case "triangle": {
+      ctx.shadowColor = particle.color
+      ctx.shadowBlur = particle.size * 2
+      ctx.beginPath()
+      ctx.moveTo(0, -particle.size)
+      ctx.lineTo(particle.size * 0.866, particle.size * 0.5)
+      ctx.lineTo(-particle.size * 0.866, particle.size * 0.5)
+      ctx.closePath()
+      ctx.fill()
+      ctx.stroke()
+      break
+    }
     }
 
     ctx.restore()

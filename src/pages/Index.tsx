@@ -77,11 +77,12 @@ const Index = () => {
       if (error) throw error
 
       setPopularAds((data as Advertisement[]) || [])
-    } catch (error: any) {
-      toast.error("Помилка завантаження популярних оголошень: " + error.message)
-    } finally {
-      setPopularAdsLoading(false)
-    }
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "невідома помилка"
+        toast.error("Помилка завантаження популярних оголошень: " + errorMessage)
+      } finally {
+        setPopularAdsLoading(false)
+      }
   }
 
   return (

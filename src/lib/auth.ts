@@ -80,8 +80,9 @@ export const registerUser = async (nickname: string, email: string, password: st
 
     await setUserContext(profile.id);
     return { user: profile as User, error: null };
-  } catch (error: any) {
-    return { user: null, error: error.message };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Невідома помилка реєстрації';
+    return { user: null, error: message };
   }
 };
 
@@ -124,8 +125,9 @@ export const loginUser = async (identifier: string, password: string) => {
 
     await setUserContext(profile.id);
     return { user: profile as User, error: null };
-  } catch (error: any) {
-    return { user: null, error: error.message };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Невідома помилка авторизації';
+    return { user: null, error: message };
   }
 };
 
@@ -136,8 +138,9 @@ export const logoutUser = async () => {
     if (error) throw error;
     await setUserContext(null); // Clear RLS context
     return { error: null };
-  } catch (error: any) {
-    return { error: error.message };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Невідома помилка виходу';
+    return { error: message };
   }
 };
 

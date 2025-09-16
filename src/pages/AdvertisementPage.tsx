@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, MessageCircle, Crown, Shield, Edit, Trash2 } from 'lucide-react';
@@ -42,17 +42,7 @@ const AdvertisementPage = () => {
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  useEffect(() => {
-    const initAndFetch = async () => {
-      if (user) {
-        await initializeUserContext();
-      }
-      fetchAdvertisement();
-    };
-    initAndFetch();
-  }, [id, user]);
-
-  const fetchAdvertisement = async () => {
+  const fetchAdvertisement = useCallback(async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -66,12 +56,24 @@ const AdvertisementPage = () => {
 
       if (error) throw error;
       setAdvertisement(data);
-    } catch (error: any) {
-      toast.error('Помилка завантаження оголошення: ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'невідома помилка';
+      toast.error('Помилка завантаження оголошення: ' + errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    const initAndFetch = async () => {
+      if (user) {
+        await initializeUserContext();
+      }
+      await fetchAdvertisement();
+    };
+
+    void initAndFetch();
+  }, [fetchAdvertisement, user]);
 
   const handleDelete = async () => {
     if (!advertisement || !user) return;
@@ -88,10 +90,11 @@ const AdvertisementPage = () => {
 
       toast.success('Оголошення видалено успішно');
       navigate('/');
-    } catch (error: any) {
-      toast.error('Помилка видалення: ' + error.message);
-    }
-  };
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'невідома помилка';
+        toast.error('Помилка видалення: ' + errorMessage);
+      }
+    };
 
   const canEdit = user && (user.id === advertisement?.user_id || hasPermission(user, ['admin', 'moderator']));
 

@@ -64,7 +64,7 @@ interface AdminLog {
   admin_id: string | null;
   action: string;
   target_user_id: string | null;
-  details: any | null;
+  details: Record<string, unknown> | null;
   created_at: string;
   users?: { nickname: string } | null;
   target_user?: { nickname: string } | null;
@@ -175,10 +175,10 @@ const AdminPanel = () => {
         todayAds: todayAds || 0,
         totalMessages: totalMessages || 0,
       });
-    } catch (error) {
-      console.error("Error fetching stats:", error);
-      toast.error("Не вдалося завантажити статистику");
-    }
+      } catch (error: unknown) {
+        console.error("Error fetching stats:", error);
+        toast.error("Не вдалося завантажити статистику");
+      }
   }, []);
 
   const fetchUsers = useCallback(async () => {
@@ -203,10 +203,10 @@ const AdminPanel = () => {
 
       setUsers(data || []);
       setTotalUsersCount(count || 0);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      toast.error("Не вдалося завантажити користувачів");
-    } finally {
+      } catch (error: unknown) {
+        console.error("Error fetching users:", error);
+        toast.error("Не вдалося завантажити користувачів");
+      } finally {
       setIsLoading(false);
     }
   }, [userPagination.currentPage, userPagination.itemsPerPage, userFilters]);
@@ -233,10 +233,10 @@ const AdminPanel = () => {
 
       setAdvertisements(data || []);
       setTotalAdsCount(count || 0);
-    } catch (error) {
-      console.error("Error fetching advertisements:", error);
-      toast.error("Не вдалося завантажити оголошення");
-    } finally {
+      } catch (error: unknown) {
+        console.error("Error fetching advertisements:", error);
+        toast.error("Не вдалося завантажити оголошення");
+      } finally {
       setIsLoading(false);
     }
   }, [adPagination.currentPage, adPagination.itemsPerPage, adFilters]);
@@ -255,38 +255,38 @@ const AdminPanel = () => {
         .limit(50);
       if (error) throw error;
       setLogs(data || []);
-    } catch (error) {
-      console.error('Error fetching logs:', error);
-      toast.error('Не вдалося завантажити логи');
-    }
+      } catch (error: unknown) {
+        console.error('Error fetching logs:', error);
+        toast.error('Не вдалося завантажити логи');
+      }
   }, [user]);
 
   // Debounced search function (simple version for demonstration)
-  const debounce = useCallback((func: Function, delay: number) => {
-    let timeoutId: NodeJS.Timeout;
-    return (...args: any[]) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func.apply(null, args), delay);
-    };
-  }, []);
+    const debounce = useCallback(<Args extends unknown[]>(func: (...args: Args) => void, delay: number) => {
+      let timeoutId: ReturnType<typeof setTimeout>;
+      return (...args: Args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func(...args), delay);
+      };
+    }, []);
 
-  const debouncedUserSearch = useMemo(
-    () =>
-      debounce(() => {
-        userPagination.goToPage(1);
-        fetchUsers();
-      }, 500),
-    [fetchUsers, userPagination],
-  );
+    const debouncedUserSearch = useMemo(
+      () =>
+        debounce(() => {
+          userPagination.goToPage(1);
+          fetchUsers();
+        }, 500),
+      [debounce, fetchUsers, userPagination],
+    );
 
-  const debouncedAdSearch = useMemo(
-    () =>
-      debounce(() => {
-        adPagination.goToPage(1);
-        fetchAdvertisements();
-      }, 500),
-    [fetchAdvertisements, adPagination],
-  );
+    const debouncedAdSearch = useMemo(
+      () =>
+        debounce(() => {
+          adPagination.goToPage(1);
+          fetchAdvertisements();
+        }, 500),
+      [debounce, fetchAdvertisements, adPagination],
+    );
 
   // Effects
   useEffect(() => {
@@ -313,86 +313,97 @@ const AdminPanel = () => {
     debouncedAdSearch();
   }, [adSearch, adStatusFilter, debouncedAdSearch]);
 
-  const logAction = async (action: string, targetUserId?: string, details?: any) => {
-    try {
-      await supabase
-        .from('admin_logs')
-        .insert([{
-          admin_id: user?.id,
-          action,
-          target_user_id: targetUserId || null,
-          details: details || {}
-        }]);
-    } catch (error) {
-      console.error('Failed to log action:', error);
-    }
-  };
+    const logAction = useCallback(
+      async (action: string, targetUserId?: string, details?: Record<string, unknown>) => {
+        try {
+          await supabase.from('admin_logs').insert([
+            {
+              admin_id: user?.id ?? null,
+              action,
+              target_user_id: targetUserId ?? null,
+              details: details ?? {},
+            },
+          ]);
+        } catch (error: unknown) {
+          console.error('Failed to log action:', error);
+        }
+      },
+      [user?.id],
+    );
 
-  const handleUserAction = async (targetUserId: string, action: string, value?: any) => {
-    try {
-      let result;
-      switch (action) {
-        case "ban":
-          result = await banUser(targetUserId, value);
-          break;
-        case "role":
-          result = await updateUserRole(targetUserId, value);
-          break;
-        case "vip":
-          result = await giveVipStatus(targetUserId, value || 30);
-          break;
-        default:
-          return;
+    type UserAction = 'ban' | 'role' | 'vip';
+    type UserActionValue = boolean | UserProfile['role'] | number | undefined;
+
+    const handleUserAction = async (targetUserId: string, action: UserAction, value?: UserActionValue) => {
+      try {
+        let result: Awaited<ReturnType<typeof banUser>> | Awaited<ReturnType<typeof updateUserRole>> | Awaited<ReturnType<typeof giveVipStatus>>;
+
+        switch (action) {
+          case 'ban':
+            result = await banUser(targetUserId, Boolean(value));
+            break;
+          case 'role':
+            if (typeof value !== 'string') {
+              throw new Error('Необхідно вказати роль користувача');
+            }
+            result = await updateUserRole(targetUserId, value);
+            break;
+          case 'vip':
+            result = await giveVipStatus(targetUserId, typeof value === 'number' ? value : 30);
+            break;
+        }
+
+        if (result.error) {
+          throw new Error(result.error.message);
+        }
+
+        toast.success('Дію виконано успішно');
+        await logAction(`${action}${value !== undefined ? `_${value}` : ''}`, targetUserId, { action, value });
+        fetchUsers();
+        fetchAdminStats();
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Сталася невідома помилка';
+        toast.error(errorMessage);
       }
+    };
 
-      if (result.error) {
-        throw new Error(result.error.message);
+    const handlePromoteAd = async (adId: string, isVip: boolean) => {
+      try {
+        const { error } = await supabase
+          .from('advertisements')
+          .update({ is_vip: !isVip })
+          .eq('id', adId);
+
+        if (error) throw error;
+
+        toast.success(isVip ? 'VIP статус знято' : 'Надано VIP статус');
+        await logAction(isVip ? 'demote_advertisement' : 'promote_advertisement', undefined, { advertisement_id: adId });
+        fetchAdvertisements();
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Сталася невідома помилка';
+        toast.error('Помилка зміни статусу: ' + errorMessage);
       }
+    };
 
-      toast.success("Дію виконано успішно");
-      await logAction(`${action}${value ? `_${value}` : ''}`, targetUserId, { action, value });
-      fetchUsers();
-      fetchAdminStats();
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
+    const handleDeleteAd = async (adId: string) => {
+      if (!confirm('Ви впевнені, що хочете видалити це оголошення?')) return;
 
-  const handlePromoteAd = async (adId: string, isVip: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('advertisements')
-        .update({ is_vip: !isVip })
-        .eq('id', adId);
+      try {
+        const { error } = await supabase
+          .from('advertisements')
+          .delete()
+          .eq('id', adId);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast.success(isVip ? 'VIP статус знято' : 'Надано VIP статус');
-      await logAction(isVip ? 'demote_advertisement' : 'promote_advertisement', undefined, { advertisement_id: adId });
-      fetchAdvertisements();
-    } catch (error: any) {
-      toast.error('Помилка зміни статусу: ' + error.message);
-    }
-  };
-
-  const handleDeleteAd = async (adId: string) => {
-    if (!confirm('Ви впевнені, що хочете видалити це оголошення?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('advertisements')
-        .delete()
-        .eq('id', adId);
-
-      if (error) throw error;
-
-      toast.success('Оголошення видалено');
-      await logAction('delete_advertisement', undefined, { advertisement_id: adId });
-      fetchAdvertisements();
-    } catch (error: any) {
-      toast.error('Помилка видалення оголошення: ' + error.message);
-    }
-  };
+        toast.success('Оголошення видалено');
+        await logAction('delete_advertisement', undefined, { advertisement_id: adId });
+        fetchAdvertisements();
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Сталася невідома помилка';
+        toast.error('Помилка видалення оголошення: ' + errorMessage);
+      }
+    };
 
   if (authLoading) {
     return (

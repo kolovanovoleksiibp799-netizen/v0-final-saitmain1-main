@@ -103,8 +103,9 @@ const CreateAdPage = () => {
 
       setImages([...images, publicUrl]);
       toast.success('Зображення завантажено успішно!');
-    } catch (error: any) {
-      toast.error('Помилка завантаження: ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'невідома помилка';
+      toast.error('Помилка завантаження: ' + errorMessage);
     } finally {
       const newUploadingImages = [...uploadingImages];
       newUploadingImages.pop();
@@ -176,8 +177,9 @@ const CreateAdPage = () => {
 
       toast.success('Оголошення створено успішно!');
       navigate('/');
-    } catch (error: any) {
-      toast.error('Помилка при створенні оголошення: ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'невідома помилка';
+      toast.error('Помилка при створенні оголошення: ' + errorMessage);
     } finally {
       setLoading(false);
     }
