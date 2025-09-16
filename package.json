@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview --port 4173"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
-    "@eslint/js": "latest",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "latest",
@@ -40,19 +40,13 @@
     "@supabase/supabase-js": "latest",
     "@tanstack/react-query": "latest",
     "@vercel/analytics": "latest",
-    "@vitejs/plugin-react-swc": "latest",
-    "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "latest",
     "date-fns": "latest",
     "embla-carousel-react": "latest",
-    "eslint": "latest",
-    "eslint-plugin-react-hooks": "latest",
-    "eslint-plugin-react-refresh": "latest",
     "framer-motion": "latest",
     "geist": "latest",
-    "globals": "latest",
     "input-otp": "latest",
     "jiti": "latest",
     "less": "latest",
@@ -77,7 +71,6 @@
     "tailwindcss-animate": "^1.0.7",
     "terser": "latest",
     "tsx": "latest",
-    "typescript-eslint": "latest",
     "vaul": "latest",
     "vite": "latest",
     "yaml": "latest",
@@ -87,9 +80,20 @@
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@vitejs/plugin-react-swc": "latest",
+    "autoprefixer": "^10.4.20",
+    "eslint": "latest",
+    "eslint-plugin-react-hooks": "latest",
+    "eslint-plugin-react-refresh": "latest",
+    "@eslint/js": "latest",
+    "globals": "latest",
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5"
+    "typescript": "^5",
+    "typescript-eslint": "latest"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "packageManager": "pnpm@10.16.0+sha512.8066e7b034217b700a9a4dbb3a005061d641ba130a89915213a10b3ca4919c19c037bec8066afdc559b89635fdb806b16ea673f2468fbb28aabfa13c53e3f769"
 }
