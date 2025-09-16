@@ -9,13 +9,9 @@ import { supabase } from "@/integrations/supabase/client"
 import { Users, FileText, Star, TrendingUp } from "lucide-react"
 import ProductCard from "@/components/ProductCard"
 import { toast } from "sonner" // Corrected import to sonner
-import type { Database } from "@/integrations/supabase/types"
 import LiquidGrassBackground from "@/components/LiquidGrassBackground"
 import FloatingParticles from "@/components/FloatingParticles"
-
-type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"] & {
-  users?: { nickname: string; role: string } | null
-}
+import type { Advertisement } from "@/lib/advertisements"
 
 const Index = () => {
   const [stats, setStats] = useState({
@@ -80,12 +76,13 @@ const Index = () => {
 
       if (error) throw error
 
-      setPopularAds(data || [])
-    } catch (error: any) {
-      toast.error("Помилка завантаження популярних оголошень: " + error.message)
-    } finally {
-      setPopularAdsLoading(false)
-    }
+      setPopularAds((data as Advertisement[]) || [])
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "невідома помилка"
+        toast.error("Помилка завантаження популярних оголошень: " + errorMessage)
+      } finally {
+        setPopularAdsLoading(false)
+      }
   }
 
   return (
@@ -226,13 +223,7 @@ const Index = () => {
                 {popularAds.map((ad, index) => (
                   <ProductCard
                     key={ad.id}
-                    id={ad.id}
-                    title={ad.title} // Changed from name to title
-                    description={ad.description}
-                    price={ad.price || 0}
-                    imageUrl={ad.images?.[0] || "https://via.placeholder.com/400x300?text=Без+фото"} // Changed from image to imageUrl
-                    isNew={false}
-                    isOnSale={false}
+                    {...ad}
                     index={index}
                   />
                 ))}

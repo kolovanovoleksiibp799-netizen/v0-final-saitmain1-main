@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { User, getCurrentUser, initializeUserContext as libInitializeUserContext, logoutUser as libLogoutUser } from '@/lib/auth';
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { User, initializeUserContext as libInitializeUserContext, logoutUser as libLogoutUser } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthChangeEvent, Session } from '@supabase/supabase-js';
+
+type SupabaseAuthUser = Session['user'];
 
 interface AuthContextType {
   user: User | null;
@@ -22,25 +24,26 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserProfile = useCallback(async (authUser: any) => {
+  const fetchUserProfile = useCallback(async (authUser: SupabaseAuthUser | null) => {
     if (!authUser) {
       setUser(null);
       return;
     }
     try {
       const { data: profile, error } = await supabase.from('users').select('*').eq('id', authUser.id).single();
-      if (error) {
+      if (error || !profile) {
         console.error('Error fetching user profile:', error);
         setUser(null);
-      } else {
-        setUser(profile as User);
+        return;
       }
-    } catch (error) {
+
+      setUser(profile as User);
+    } catch (error: unknown) {
       console.error('Error fetching user profile:', error);
       setUser(null);
     }
@@ -61,15 +64,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const getInitialSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
-      await fetchUserProfile(session?.user);
+      await fetchUserProfile(session?.user ?? null);
       setLoading(false);
     };
 
     getInitialSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event: AuthChangeEvent, session: Session | null) => {
       setSession(session);
-      await fetchUserProfile(session?.user);
+      await fetchUserProfile(session?.user ?? null);
       setLoading(false);
       // Also update RLS context on auth state change
       await libInitializeUserContext();

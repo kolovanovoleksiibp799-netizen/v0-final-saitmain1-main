@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible'
-import { CaretSortIcon } from '@radix-ui/react-icons'
 
 import { cn } from '@/lib/utils'
 

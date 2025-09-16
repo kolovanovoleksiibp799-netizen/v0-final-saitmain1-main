@@ -297,9 +297,8 @@ const Navbar = () => {
               </motion.div>
             ) : (
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.2 }}
+                whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+                whileTap={{ scale: 0.95, transition: { duration: 0.2 } }}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4, duration: 0.5 }}
@@ -316,9 +315,12 @@ const Navbar = () => {
 
             {/* Theme Toggle */}
             <motion.div
-              whileHover={{ scale: 1.05, rotate: 15 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.2 }}
+              whileHover={{
+                scale: 1.05,
+                rotate: 15,
+                transition: { duration: 0.2 },
+              }}
+              whileTap={{ scale: 0.95, transition: { duration: 0.2 } }}
               initial={{ opacity: 0, rotate: -180 }}
               animate={{ opacity: 1, rotate: 0 }}
               transition={{ delay: 0.5, duration: 0.6 }}

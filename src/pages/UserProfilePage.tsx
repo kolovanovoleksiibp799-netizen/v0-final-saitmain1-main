@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, MessageCircle, Crown, Shield, User as UserIcon } from 'lucide-react';
+import { ArrowLeft, Calendar, Crown, User as UserIcon } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -9,8 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner'; // Corrected import to sonner
-import { useAuth } from '@/contexts/AuthContext';
-import { hasPermission } from '@/lib/auth';
 
 interface UserProfile {
   id: string;
@@ -37,16 +35,11 @@ interface Advertisement {
 const UserProfilePage = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const { user: currentUser } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchUserProfileAndAds();
-  }, [userId]);
-
-  const fetchUserProfileAndAds = async () => {
+  const fetchUserProfileAndAds = useCallback(async () => {
     try {
       setLoading(true);
       // Fetch user profile
@@ -69,14 +62,19 @@ const UserProfilePage = () => {
       if (adsError) throw adsError;
       setAdvertisements(adsData || []);
 
-    } catch (error: any) {
-      toast.error('Помилка завантаження профілю: ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'невідома помилка';
+      toast.error('Помилка завантаження профілю: ' + errorMessage);
       setProfile(null);
       setAdvertisements([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchUserProfileAndAds();
+  }, [fetchUserProfileAndAds]);
 
   if (loading) {
     return (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Upload, X, Plus } from 'lucide-react';
@@ -91,7 +91,7 @@ const CreateAdPage = () => {
       const fileExt = file.name.split('.').pop();
       const fileName = `${user?.id}/${Date.now()}.${fileExt}`;
       
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('advertisement-images')
         .upload(fileName, file);
 
@@ -103,8 +103,9 @@ const CreateAdPage = () => {
 
       setImages([...images, publicUrl]);
       toast.success('Зображення завантажено успішно!');
-    } catch (error: any) {
-      toast.error('Помилка завантаження: ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'невідома помилка';
+      toast.error('Помилка завантаження: ' + errorMessage);
     } finally {
       const newUploadingImages = [...uploadingImages];
       newUploadingImages.pop();
@@ -159,7 +160,7 @@ const CreateAdPage = () => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.rpc('create_advertisement', {
+      const { error } = await supabase.rpc('create_advertisement', {
         p_user_id: user.id,
         p_category: formData.category,
         p_subcategory: formData.subcategory,
@@ -176,8 +177,9 @@ const CreateAdPage = () => {
 
       toast.success('Оголошення створено успішно!');
       navigate('/');
-    } catch (error: any) {
-      toast.error('Помилка при створенні оголошення: ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'невідома помилка';
+      toast.error('Помилка при створенні оголошення: ' + errorMessage);
     } finally {
       setLoading(false);
     }

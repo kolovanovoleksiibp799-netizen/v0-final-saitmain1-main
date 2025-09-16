@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, MessageCircle, Crown } from 'lucide-react';
+import { ArrowLeft, Calendar, Crown } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -66,49 +66,50 @@ const SubcategoryPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchAdvertisements();
-  }, [category, subcategory]);
-
-  const fetchAdvertisements = async () => {
+  const fetchAdvertisements = useCallback(async () => {
     try {
       setLoading(true);
-      let { data, error } = await supabase
+      const { data, error } = await supabase
         .from('advertisements')
         .select(`
-          *,
-          users (nickname, role)
-        `)
-        .eq('category', category)
-        .eq('subcategory', subcategory)
-        .order('created_at', { ascending: false });
+            *,
+            users (nickname, role)
+          `)
+          .eq('category', category)
+          .eq('subcategory', subcategory)
+          .order('created_at', { ascending: false });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      // Sort manually to prioritize admin, then VIP, then regular posts
-      data = (data || []).sort((a, b) => {
-        // First sort by user role (admin first)
-        const aRole = a.users?.role || 'user';
-        const bRole = b.users?.role || 'user';
-        
-        if (aRole === 'admin' && bRole !== 'admin') return -1;
+        // Sort manually to prioritize admin, then VIP, then regular posts
+        const sortedData = (data || []).sort((a, b) => {
+          // First sort by user role (admin first)
+          const aRole = a.users?.role || 'user';
+          const bRole = b.users?.role || 'user';
+
+          if (aRole === 'admin' && bRole !== 'admin') return -1;
         if (bRole === 'admin' && aRole !== 'admin') return 1;
         
         // Then sort by VIP status
         if (a.is_vip && !b.is_vip) return -1;
         if (b.is_vip && !a.is_vip) return 1;
         
-        // Finally sort by creation date (newest first)
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      });
+          // Finally sort by creation date (newest first)
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
 
-      setAdvertisements(data || []);
-    } catch (error: any) {
-      toast.error('Помилка завантаження оголошень: ' + error.message);
+      setAdvertisements(sortedData);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'невідома помилка';
+      toast.error('Помилка завантаження оголошень: ' + errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, [category, subcategory]);
+
+  useEffect(() => {
+    fetchAdvertisements();
+  }, [fetchAdvertisements]);
 
   const categoryTitle = categoryTitles[category || ''] || 'Категорія';
   const subcategoryTitle = subcategoryTitles[category || '']?.[subcategory || ''] || 'Підкатегорія';

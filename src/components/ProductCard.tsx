@@ -122,7 +122,7 @@ const ProductCard = ({
             </div>
             <div className="flex items-center">
               <Calendar className="w-3 h-3 mr-1" />
-              <span>{new Date(created_at).toLocaleDateString("uk-UA")}</span>
+              <span>{created_at ? new Date(created_at).toLocaleDateString("uk-UA") : ""}</span>
             </div>
           </div>
 
@@ -131,10 +131,10 @@ const ProductCard = ({
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 <div className="w-6 h-6 bg-accent/20 rounded-full flex items-center justify-center">
-                  <span className="text-xs font-medium">{users.nickname.charAt(0).toUpperCase()}</span>
+                  <span className="text-xs font-medium">{users?.nickname ? users.nickname.charAt(0).toUpperCase() : ""}</span>
                 </div>
-                <span className="text-sm text-muted-foreground">{users.nickname}</span>
-                {users.role !== "user" && (
+                <span className="text-sm text-muted-foreground">{users?.nickname}</span>
+                {users?.role && users.role !== "user" && (
                   <Badge variant="outline" className="text-xs">
                     {users.role === "vip" ? "VIP" : users.role.toUpperCase()}
                   </Badge>

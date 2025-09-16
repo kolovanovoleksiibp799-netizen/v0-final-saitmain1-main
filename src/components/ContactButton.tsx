@@ -36,10 +36,11 @@ const ContactButton: React.FC<ContactButtonProps> = ({ userId, userName, adverti
       setIsOpen(false);
       setMessage('');
       toast.success('Повідомлення надіслано');
-    } catch (error: any) {
-      toast.error('Помилка надсилання повідомлення: ' + error.message);
-    }
-  };
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'невідома помилка';
+        toast.error('Помилка надсилання повідомлення: ' + errorMessage);
+      }
+    };
 
   if (!user) {
     return (

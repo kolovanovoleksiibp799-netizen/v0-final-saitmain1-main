@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Send, User, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -9,11 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useMessages } from '@/contexts/MessagesContext';
+import type { Conversation } from '@/contexts/MessagesContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { uk } from 'date-fns/locale';
-import { toast } from 'sonner'; // Corrected import to sonner
 
 const MessagesPage = () => {
   const navigate = useNavigate();
@@ -59,11 +58,17 @@ const MessagesPage = () => {
     setNewMessage('');
   };
 
-  const getOtherUser = (conversation: any) => {
-    if (!user) return null;
-    return conversation.user1_id === user.id ? conversation.other_user : 
-           conversation.user1_id === conversation.other_user?.id ? conversation.other_user : null;
-  };
+    const getOtherUser = (conversation?: Conversation) => {
+      if (!conversation || !user) {
+        return null;
+      }
+
+      if (conversation.user1_id === user.id || conversation.user2_id === user.id) {
+        return conversation.other_user ?? null;
+      }
+
+      return conversation.other_user ?? null;
+    };
 
   if (!user) {
     return (
