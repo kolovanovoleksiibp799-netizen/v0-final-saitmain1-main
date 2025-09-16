@@ -11,9 +11,6 @@ importers:
       '@emotion/is-prop-valid':
         specifier: latest
         version: 1.4.0
-      '@eslint/js':
-        specifier: latest
-        version: 9.35.0
       '@hookform/resolvers':
         specifier: ^3.9.1
         version: 3.9.1(react-hook-form@7.62.0(react@18.3.1))
@@ -101,12 +98,6 @@ importers:
       '@vercel/analytics':
         specifier: latest
         version: 1.5.0(next@14.2.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.92.1))(react@18.3.1)
-      '@vitejs/plugin-react-swc':
-        specifier: latest
-        version: 4.0.1(vite@7.1.5(@types/node@22.0.0)(jiti@2.5.1)(less@4.4.1)(lightningcss@1.30.1)(sass-embedded@1.92.1)(sass@1.92.1)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.0))(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1))
-      autoprefixer:
-        specifier: ^10.4.20
-        version: 10.4.20(postcss@8.5.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -122,24 +113,12 @@ importers:
       embla-carousel-react:
         specifier: latest
         version: 8.6.0(react@18.3.1)
-      eslint:
-        specifier: latest
-        version: 9.35.0(jiti@2.5.1)
-      eslint-plugin-react-hooks:
-        specifier: latest
-        version: 5.2.0(eslint@9.35.0(jiti@2.5.1))
-      eslint-plugin-react-refresh:
-        specifier: latest
-        version: 0.4.20(eslint@9.35.0(jiti@2.5.1))
       framer-motion:
         specifier: latest
         version: 12.23.12(@emotion/is-prop-valid@1.4.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       geist:
         specifier: latest
         version: 1.5.1(next@14.2.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.92.1))
-      globals:
-        specifier: latest
-        version: 16.4.0
       input-otp:
         specifier: latest
         version: 1.4.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -212,9 +191,6 @@ importers:
       tsx:
         specifier: latest
         version: 4.20.5
-      typescript-eslint:
-        specifier: latest
-        version: 8.44.0(eslint@9.35.0(jiti@2.5.1))(typescript@5.0.2)
       vaul:
         specifier: latest
         version: 1.1.2(@types/react-dom@18.0.0)(@types/react@18.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -228,6 +204,9 @@ importers:
         specifier: ^3.24.1
         version: 3.24.1
     devDependencies:
+      '@eslint/js':
+        specifier: latest
+        version: 9.35.0
       '@types/node':
         specifier: ^22
         version: 22.0.0
@@ -237,6 +216,24 @@ importers:
       '@types/react-dom':
         specifier: ^18
         version: 18.0.0
+      '@vitejs/plugin-react-swc':
+        specifier: latest
+        version: 4.0.1(vite@7.1.5(@types/node@22.0.0)(jiti@2.5.1)(less@4.4.1)(lightningcss@1.30.1)(sass-embedded@1.92.1)(sass@1.92.1)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.0))(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1))
+      autoprefixer:
+        specifier: ^10.4.20
+        version: 10.4.20(postcss@8.5.0)
+      eslint:
+        specifier: latest
+        version: 9.35.0(jiti@2.5.1)
+      eslint-plugin-react-hooks:
+        specifier: latest
+        version: 5.2.0(eslint@9.35.0(jiti@2.5.1))
+      eslint-plugin-react-refresh:
+        specifier: latest
+        version: 0.4.20(eslint@9.35.0(jiti@2.5.1))
+      globals:
+        specifier: latest
+        version: 16.4.0
       postcss:
         specifier: ^8.5
         version: 8.5.0
@@ -246,6 +243,9 @@ importers:
       typescript:
         specifier: ^5
         version: 5.0.2
+      typescript-eslint:
+        specifier: latest
+        version: 8.44.0(eslint@9.35.0(jiti@2.5.1))(typescript@5.0.2)
 
 packages:
 
